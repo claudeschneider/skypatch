@@ -1,3 +1,4 @@
+import {showVisibility} from './visibility-panel.js';
 import {skyLight} from './sky-light.js';
 import {createPatchHandles} from './patch-handles.js';
 import {arrangePanels,panelModes} from './panel-layout.js';
@@ -169,6 +170,7 @@ function renderSelection(){
  <button id="inspectFrame" class="primary wide">Frame target on the sky</button>
  <dl><div><dt>Altitude / azimuth</dt><dd>${fmt(h.alt)}° / ${fmt(h.az)}°</dd></div><div><dt>Magnitude ${o.band||''}</dt><dd>${fmt(o.mag,2)}</dd></div><div><dt>Angular extent</dt><dd>${fmt(o.major,2)}′ ${o.minor?'× '+fmt(o.minor,2)+'′':''}</dd></div><div><dt>Frame width filled</dt><dd>${fill==null?'Unknown':fmt(fill,0)+'%'}</dd></div><div><dt>Long-axis sampling</dt><dd>${o.major==null?'Unknown':'≈ '+(e.pixels?Math.round(o.major/60/e.width*e.pixels)+' pixels':'Unknown sensor sampling')}</dd></div><div><dt>Surface brightness B</dt><dd>${o.sb==null?'Unknown':fmt(o.sb,2)+' mag/arcsec²'}</dd></div><div><dt>Composition</dt><dd>${fmt(e.width*e.mx,3)}° × ${fmt(e.height*e.my,3)}°</dd></div></dl><p class="hint">${o.outline?'Sourced OpenNGC contour.':o.major?'Catalogue ellipse; '+(o.pa==null?'position angle unknown.':'position angle '+o.pa+'°.'):'Angular extent unknown; shown as a discovery dot.'} ${o.minor==null&&o.major?'Minor axis unknown; circular approximation.':''} Size describes extent, not resolved detail.</p>`;
  if($('#selection .object-description'))$('#selection .photo-preview').before($('#selection .object-description'));
+ showVisibility($('#selection'),o,state,setTime);
  attachObjectInfo(o);
  $('#inspectFrame').onclick=frameTarget;
  $('#targetPhoto').onload=()=>{$('#photoState').hidden=true;};
@@ -184,6 +186,7 @@ function renderSolarSelection(o){
  <dl><div><dt>Disc diameter</dt><dd>${fmt(o.major,2)}′ / ${fmt(o.major*60,1)}″</dd></div><div><dt>Sampling across disc</dt><dd>${pixels==null?'Unknown':('≈ '+fmt(pixels,1)+' pixels')}</dd></div><div><dt>Single-frame width filled</dt><dd>${fmt(frameFill(o,e.width),2)}%</dd></div><div><dt>Altitude / azimuth</dt><dd>${fmt(h.alt)}° / ${fmt(h.az)}°</dd></div>${o.phase==null?'':`<div><dt>Illuminated fraction</dt><dd>${fmt(o.phase*100,1)}%</dd></div>`}<div><dt>Magnitude V</dt><dd>${fmt(o.mag,2)}</dd></div><div><dt>Composition</dt><dd>${fmt(e.width*e.mx,3)}° × ${fmt(e.height*e.my,3)}°</dd></div></dl>
  <p class="hint">${o.id==='Saturn'?'Globe diameter only; rings are not included. ':''}A tiny cross marks an unresolved disc at wide zoom; it is not an enlarged planet. Sampling does not imply resolved detail.</p>`;
  if($('#selection .object-description'))$('#selection .photo-preview').before($('#selection .object-description'));
+ showVisibility($('#selection'),o,state,setTime);
  attachObjectInfo(o);
  $('#inspectFrame').onclick=frameTarget;
 }

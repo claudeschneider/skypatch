@@ -2,6 +2,10 @@
 
 Every new commit receives an incremented version. Earlier commits are recorded below without rewriting their history.
 
+## 0.8.0 — 2026-09-10
+
+- Added altitude charts and above-horizon visibility windows in Info, including times inside your saved My Sky patch and a planning-time preview slider.
+
 ## 0.7.0 — 2026-09-10
 
 - Sky brightness now follows the Sun: dark nights, blue twilight and light-blue daytime, while stars and targets stay available for planning.

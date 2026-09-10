@@ -7,8 +7,8 @@
 A local-first astrophotography planner built around Stellarium Web Engine. Explore the sky, discover deep-sky targets and preview their true angular size in a DWARF Mini frame.
 
 <!-- release:start -->
-## Latest release · 0.7.0 — 2026-09-10
-- Sky brightness now follows the Sun: dark nights, blue twilight and light-blue daytime, while stars and targets stay available for planning.
+## Latest release · 0.8.0 — 2026-09-10
+- Added altitude charts and above-horizon visibility windows in Info, including times inside your saved My Sky patch and a planning-time preview slider.
 
 [Full changelog](CHANGELOG.md) · [Website changelog](https://claudeschneider.github.io/skypatch/changelog.html)
 <!-- release:end -->

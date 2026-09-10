@@ -190,3 +190,7 @@ test('Mobile patch taps add corners while two fingers pan and zoom without addin
  expect(await page.evaluate(()=>skyPatch.engine.stel.core.observer.yaw)).not.toBe(before.yaw);expect(await page.evaluate(()=>skyPatch.engine.fov)).toBeLessThan(before.fov);
  await page.locator('#undoPatch').tap();await expect(page.locator('#undoPatch')).toBeDisabled();await context.close();
 });
+
+test('Visibility altitude agrees with the planetarium at the selected time',async({page})=>{
+ await start(page);const result=await page.evaluate(async()=>{const {visibility}=await import('/src/visibility.js');const o=skyPatch.objects.find(o=>o.id==='M33'),date=new Date('2026-09-10T06:00:00Z');skyPatch.setTime(date,true);const data=visibility(o,skyPatch.state.lat,skyPatch.state.lon,date);return {predicted:data.samples.find(s=>s.time===+date).alt,actual:skyPatch.engine.horizontal(o.v).alt};});expect(Math.abs(result.predicted-result.actual)).toBeLessThan(.05);
+});
