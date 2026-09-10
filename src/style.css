@@ -18,3 +18,5 @@
 @media(max-width:650px) and (orientation:landscape){.workspace aside{height:85%;width:55%}.timeline input[type=range]{order:0;min-width:60px}.timeline{flex-wrap:nowrap}.timeline label{min-width:0}.timeline label>input{width:170px}.timezone{display:none}}
 
 @media(max-width:650px){.workspace aside.expanded{height:88%;max-height:none}#drawerHandle{touch-action:none}}
+
+#sidebarToggle{display:none}.all-names{margin-bottom:12px}.all-names .aliases{overflow-wrap:anywhere}.object-description{font-size:13px;line-height:1.65;color:#c5d2e4;margin:12px 0}.type-actions{display:flex;gap:8px;margin:8px 0}#typeChoices{max-height:260px;overflow:auto}#typeChoices label{font-size:12px}.constellation-controls{display:flex;align-items:center;gap:6px;background:#111c2dda;border-radius:6px;padding-left:8px;font-size:11px}.constellation-controls button[aria-pressed=true]{color:#b7f0dc;background:#20382f;border-color:#568471}@media(max-width:650px){#sidebarToggle{display:block;position:absolute;left:10px;top:10px;z-index:3;background:#142033ee;min-width:60px}.sky-context{top:64px;max-width:calc(100% - 20px)}.constellation-controls{flex-wrap:wrap}}

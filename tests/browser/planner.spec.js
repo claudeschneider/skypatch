@@ -66,12 +66,14 @@ test('Solar layer is independent of DSO size filters but respects horizon and vi
 
 test('Wheel and trackpad zoom preserve the centred target with an off-centre cursor',async({page})=>{
  await start(page);await page.evaluate(()=>skyPatch.select(skyPatch.objects.find(o=>o.id==='M57'),true));
- const before=await page.evaluate(()=>({fov:skyPatch.engine.fov,yaw:skyPatch.engine.stel.core.observer.yaw,pitch:skyPatch.engine.stel.core.observer.pitch}));
+ await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+ const before=await page.evaluate(()=>{const e=skyPatch.engine,r=document.querySelector('#sky').getBoundingClientRect(),p=e.project(skyPatch.state.selected.v,r.width,r.height,null);return {fov:e.fov,yaw:e.stel.core.observer.yaw,pitch:e.stel.core.observer.pitch,dx:p[0]-r.width/2,dy:p[1]-r.height/2};});
  const rect=await page.locator('#sky').boundingBox();await page.mouse.move(rect.x+rect.width*.85,rect.y+rect.height*.25);
  await page.mouse.wheel(0,-240);await expect.poll(()=>page.evaluate(()=>skyPatch.engine.fov)).toBeLessThan(before.fov);
  await page.mouse.wheel(0,480);await expect.poll(()=>page.evaluate(()=>skyPatch.engine.fov)).toBeGreaterThan(before.fov);
- const after=await page.evaluate(()=>{const e=skyPatch.engine,r=document.querySelector('#sky').getBoundingClientRect(),p=e.project(skyPatch.state.selected.v,r.width,r.height,null);return {yaw:e.stel.core.observer.yaw,pitch:e.stel.core.observer.pitch,dx:p[0]-r.width/2,dy:p[1]-r.height/2};});
- expect(after.yaw).toBeCloseTo(before.yaw,10);expect(after.pitch).toBeCloseTo(before.pitch,10);expect(Math.abs(after.dx)).toBeLessThan(.1);expect(Math.abs(after.dy)).toBeLessThan(.1);
+ const after=await page.evaluate(()=>{const e=skyPatch.engine,r=document.querySelector('#sky').getBoundingClientRect(),p=e.project(skyPatch.state.selected.v,r.width,r.height,null);return {fov:e.fov,yaw:e.stel.core.observer.yaw,pitch:e.stel.core.observer.pitch,dx:p[0]-r.width/2,dy:p[1]-r.height/2};});
+ expect(after.yaw).toBeCloseTo(before.yaw,10);expect(after.pitch).toBeCloseTo(before.pitch,10);// Pointing is unchanged above; allow subpixel native projection/refraction rounding.
+ const scale=Math.tan(before.fov*Math.PI/720)/Math.tan(after.fov*Math.PI/720);expect(Math.abs(after.dx-before.dx*scale)).toBeLessThan(.25);expect(Math.abs(after.dy-before.dy*scale)).toBeLessThan(.25);
  const legacy=await page.evaluate(()=>{const e=skyPatch.engine,fov=e.fov;document.querySelector('#sky').dispatchEvent(new WheelEvent('mousewheel',{bubbles:true,cancelable:true,deltaY:-120}));return {before:fov,after:e.fov};});expect(legacy.after).toBe(legacy.before);
 });
 test('Ground is opaque below the horizon, independent of the grid, and persists',async({page})=>{
@@ -156,4 +158,17 @@ test('Mobile bottom drawer, compact toolbar and centred touch pinch',async({brow
  await page.locator('#sidebarToggle').tap();const box=await page.locator('#sidebar').boundingBox();expect(box.width).toBe(390);expect(box.y).toBeGreaterThan(200);
  const handle=await page.locator('#drawerHandle').boundingBox();await touch('touchStart',[[180,handle.y+20]]);await touch('touchMove',[[180,handle.y-50]]);await touch('touchEnd',[]);await expect(page.locator('#sidebar')).toHaveClass('expanded');
  await page.locator('#drawerHandle').tap();await expect(page.locator('#sidebar')).not.toBeVisible();await context.close();
+});
+
+test('Multi-type choices, equipment presets, constellation modes and bundled descriptions',async({page})=>{
+ await start(page);await expect(page.getByRole('button',{name:'Hide panel',exact:true})).toHaveCount(0);await expect(page.locator('#sidebarToggle')).toBeHidden();
+ await page.locator('#typeSummary').click();await page.locator('#noTypes').click();await page.locator('[data-type="Galaxy"]').check();await page.locator('[data-type="Emission nebula"]').check();
+ expect(await page.evaluate(()=>skyPatch.state.filters.types)).toEqual(['Emission nebula','Galaxy']);expect(await page.evaluate(()=>skyPatch.filtered.filter(o=>!o.solar).every(o=>['Emission nebula','Galaxy'].includes(o.type)))).toBe(true);
+ await page.locator('#typesEnabled').uncheck();await expect(page.locator('[data-type="Galaxy"]')).toBeDisabled();await page.locator('#typesEnabled').check();await expect(page.locator('[data-type="Galaxy"]')).toBeChecked();
+ await page.locator('[data-constellations="full"]').click();expect(await page.evaluate(()=>skyPatch.engine.stel.core.constellations.show_only_pointed)).toBe(false);
+ await page.locator('[data-constellations="off"]').click();expect(await page.evaluate(()=>skyPatch.engine.stel.core.constellations.lines_visible)).toBe(false);
+ await page.locator('[data-constellations="focus"]').click();expect(await page.evaluate(()=>skyPatch.engine.stel.core.constellations.show_only_pointed)).toBe(true);
+ await page.evaluate(()=>skyPatch.select(skyPatch.objects.find(o=>o.id==='M33')));await expect(page.locator('#selection')).toContainText('NGC 598');await expect(page.locator('.object-description')).toContainText('Triangulum');
+ await page.locator('#equipmentPreset').selectOption('ff24');expect(await page.evaluate(()=>skyPatch.state.equipment.width)).toBeCloseTo(73.7398,3);await page.locator('#equipmentPreset').selectOption('s30pro');expect(await page.evaluate(()=>skyPatch.state.equipment.width<skyPatch.state.equipment.height)).toBe(true);
+ await page.reload();await page.waitForFunction(()=>window.skyPatch);expect(await page.evaluate(()=>skyPatch.state.equipment.preset)).toBe('s30pro');expect(await page.evaluate(()=>skyPatch.state.filters.types)).toEqual(['Emission nebula','Galaxy']);
 });

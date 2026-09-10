@@ -11,10 +11,10 @@
 Pan to your view and choose Draw patch. Click or tap corners, then Finish. Undo removes the last corner. Cancel preserves an existing boundary. The patch stays fixed to the local horizon as time changes; it filters by object centre. Toggle it or All filters to pause filtering. Redraw when changing sites.
 
 ## Mobile controls
-Use Show panel to open the bottom drawer. Swipe the drawer header upward to expand; swipe down to collapse/dismiss, or tap the header to close. The View button contains map layers. One finger pans; pinching zooms around the viewport centre. Tap an object to open its details. Rotate the device if you prefer landscape.
+Use Plan to open the bottom drawer. Swipe the drawer header upward to expand; swipe down to collapse/dismiss, or tap the header to close. The View button contains map layers. One finger pans; pinching zooms around the viewport centre. Tap an object to open its details. Rotate the device if you prefer landscape.
 
 ## Install and prepare for offline use
-Open the app online and select Install / Offline near the bottom of the panel, or use the landing page's installation button. Wait for Core ready offline. This saves the planetarium, bundled bright stars, DSO catalogue and framing tools (about 9.4 MB).
+Open the app online and select Install / Offline near the bottom of the panel, or use the landing page's installation button. Wait for Core ready offline. This saves the planetarium, bundled bright stars, DSO catalogue and framing tools (about 9.6 MB).
 
 - iPhone/iPad: Safari → Share → Add to Home Screen.
 - Android: use the in-app Install button if offered, or your browser's Install app menu.
@@ -32,3 +32,5 @@ Before leaving, verify readiness, turn off your connection and reload the app. B
 Survey images illustrate angular scale, not the result your equipment will achieve. Planet discs are geometric footprints; Saturn's rings are not represented. Use a proper solar filter before pointing a telescope at the Sun. Sky Patch does not control the telescope.
 
 Settings stay in the browser and do not sync between devices. There are no app accounts or analytics. Online survey and information requests contact their respective providers. See the in-app credits for data sources and licensing.
+
+Equipment presets and constellation modes are available in the Framing panel and map toolbar respectively. Expand Object type to select several categories. Expand All names & identifiers for alternate catalogue names. DSO paragraphs are included in the core offline download.

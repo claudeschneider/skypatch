@@ -3,7 +3,7 @@ export const defaults={types:[],above:true,altMin:0,altMax:90,sizeMin:3,sizeMax:
 export function exclusions(o,f,alt,width=2.14){
  const reasons=[];
  if(f.enabled===false)return reasons;
- if(f.typesEnabled!==false&&f.types.length&&!f.types.includes(o.type))reasons.push('Object type');
+ if(f.typesEnabled!==false&&(f.typesNone||(f.types.length&&!f.types.includes(o.type))))reasons.push('Object type');
  if(f.altEnabled!==false&&f.above&&alt<0)reasons.push('Below horizon');
  if(f.altEnabled!==false&&(alt<f.altMin||alt>f.altMax))reasons.push('Altitude');
  for(const [key,value,min,max,label] of [['size',o.major,f.sizeMin,f.sizeMax,'Angular size'],['mag',o.mag,f.magMin,f.magMax,'Magnitude'],['sb',o.sb,f.sbMin,f.sbMax,'Surface brightness'],['fill',frameFill(o,width),f.fillMin,f.fillMax,'Frame fill']]){

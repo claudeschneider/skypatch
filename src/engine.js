@@ -72,5 +72,6 @@ export class SkyEngine{
   });
  }
  get fov(){return this.stel.core.fov/RAD;}
+ constellations(mode){const c=this.stel.core.constellations;c.lines_visible=mode!=='off';c.labels_visible=mode!=='off';c.show_only_pointed=mode!=='full';}
  toggle(name,value){const c=this.stel.core;if(name==='grid')c.lines.azimuthal.visible=value;if(name==='lines')c.constellations.lines_visible=value;if(name==='survey')c.dss.visible=value;}
 }
