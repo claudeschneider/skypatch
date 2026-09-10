@@ -7,9 +7,9 @@
 A local-first astrophotography planner built around Stellarium Web Engine. Explore the sky, discover deep-sky targets and preview their true angular size in a DWARF Mini frame.
 
 <!-- release:start -->
-## Latest release · 0.3.0 — 2026-09-09
-- Pan and zoom while drawing a sky patch: Space-drag and scroll on desktop, or two-finger pan/pinch on mobile. Single taps add corners.
-- Fixed the release helper so version bumps run correctly.
+## Latest release · 0.4.0 — 2026-09-10
+- Show or hide the mobile time panel; your choice is remembered.
+- Find Install in the mobile header, with a dismissible first-visit prompt that stays hidden in the installed app.
 
 [Full changelog](CHANGELOG.md) · [Website changelog](https://claudeschneider.github.io/skypatch/changelog.html)
 <!-- release:end -->

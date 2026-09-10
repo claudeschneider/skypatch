@@ -2,6 +2,11 @@
 
 Every new commit receives an incremented version. Earlier commits are recorded below without rewriting their history.
 
+## 0.4.0 — 2026-09-10
+
+- Show or hide the mobile time panel; your choice is remembered.
+- Find Install in the mobile header, with a dismissible first-visit prompt that stays hidden in the installed app.
+
 ## 0.3.0 — 2026-09-09
 
 - Pan and zoom while drawing a sky patch: Space-drag and scroll on desktop, or two-finger pan/pinch on mobile. Single taps add corners.

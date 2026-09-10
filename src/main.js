@@ -1,3 +1,4 @@
+import {installTimeToggle} from './mobile-controls.js';
 import {installPatchInput} from './patch-input.js';
 import {equipmentPresets,selectedEquipment} from './equipment.js';
 import {objectNames,catalogueDescription} from './descriptions.js';
@@ -64,7 +65,7 @@ $('#app').innerHTML=`
 <div id="patchDrawing" class="patch-drawing" hidden><span id="patchDrawHint">Tap corners, then Finish. Desktop: hold Space and drag to pan; scroll to zoom. Mobile: use two fingers to pan and pinch.</span><button id="undoPatch">Undo</button><button id="finishPatch">Finish</button><button id="cancelPatch">Cancel</button></div><div id="skyContext" class="sky-context"></div><div id="message" role="status" class="map-message">Loading the planetarium…</div>
 <div class="map-navigation"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="wideView" title="Return to a wide sky view">Wide</button><button id="frameTarget" disabled>Frame target</button></div>
 <div class="map-bottom"><span id="mapReadout">Drag to explore · scroll to zoom</span><span class="legend"><i></i> Camera frame <i class="mosaic"></i> Mosaic</span></div></section></div>
-<section class="timeline" aria-label="Planning time"><label>Planning time <input id="date" type="datetime-local" step="60"></label><span class="timezone" id="timezone"></span><button id="now">Now</button><button id="backHour" aria-label="One hour earlier">−1 h</button><input id="timeSlider" type="range" min="-720" max="720" step="5" value="0" aria-label="Time offset in minutes"><button id="forwardHour" aria-label="One hour later">+1 h</button><output id="timeOffset">±12 hours</output></section>
+<section id="planningTime" class="timeline" aria-label="Planning time"><label>Planning time <input id="date" type="datetime-local" step="60"></label><span class="timezone" id="timezone"></span><button id="now">Now</button><button id="backHour" aria-label="One hour earlier">−1 h</button><input id="timeSlider" type="range" min="-720" max="720" step="5" value="0" aria-label="Time offset in minutes"><button id="forwardHour" aria-label="One hour later">+1 h</button><output id="timeOffset">±12 hours</output></section>
 <dialog id="siteDialog"><form id="siteForm"><h2>Observing location</h2><p>The sky is calculated for this location. Saved only in this browser.</p><label>Location name<input id="locationName" maxlength="80"></label><div class="range-pair"><label>Latitude °<input id="latitude" type="number" min="-90" max="90" step="any" required></label><label>Longitude °<input id="longitude" type="number" min="-180" max="180" step="any" required></label></div><p class="hint">North / east positive, south / west negative.</p><button id="geolocate" type="button" class="secondary wide">Use my current location</button><p id="locationStatus" role="status"></p><div class="dialog-actions"><button type="button" id="cancelSite">Cancel</button><button type="submit" class="primary">Save location</button></div></form></dialog>`;
 
 // Group switches preserve values and the user's individual enabled choices.
@@ -104,6 +105,7 @@ $('#finishPatch').onclick=()=>{try{const contains=preparePatch(draftPatch);state
 $('#clearPatch').onclick=()=>{state.patch={vertices:[],enabled:false};patchContains=null;recompute();};
 $('#patchEnabled').onchange=event=>{state.patch.enabled=event.target.checked;recompute();};
 document.addEventListener('keydown',event=>{if(drawingPatch&&event.key==='Escape'){event.preventDefault();endPatchDrawing();}});
+installTimeToggle();
 const offlineReady=installOffline();
 const connection=document.createElement('span');connection.className='network-state';document.querySelector('.side-footer').prepend(connection);
 function updateConnection(){connection.textContent=navigator.onLine?'':'Offline · survey detail and articles may be unavailable';}

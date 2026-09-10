@@ -36,3 +36,5 @@ Survey images illustrate angular scale, not the result your equipment will achie
 Settings stay in the browser and do not sync between devices. There are no app accounts or analytics. Online survey and information requests contact their respective providers. See the in-app credits for data sources and licensing.
 
 Equipment presets and constellation modes are available in the Framing panel and map toolbar respectively. Expand Object type to select several categories. Expand All names & identifiers for alternate catalogue names. DSO paragraphs are included in the core offline download.
+
+On mobile, use **Hide time / Show time** above the map to reclaim screen space; the choice is saved. **Install** is also available in the header. A first-visit prompt links to offline setup and can be dismissed with **Not now**. Installed apps do not show the prompt or header Install button.
