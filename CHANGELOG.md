@@ -2,6 +2,10 @@
 
 Every new commit receives an incremented version. Earlier commits are recorded below without rewriting their history.
 
+## 0.7.0 — 2026-09-10
+
+- Sky brightness now follows the Sun: dark nights, blue twilight and light-blue daytime, while stars and targets stay available for planning.
+
 ## 0.6.0 — 2026-09-10
 
 - Edit My Sky corners by dragging them, with Save, Cancel and Redraw from scratch.

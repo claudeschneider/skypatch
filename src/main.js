@@ -1,3 +1,4 @@
+import {skyLight} from './sky-light.js';
 import {createPatchHandles} from './patch-handles.js';
 import {arrangePanels,panelModes} from './panel-layout.js';
 import {installTimeToggle} from './mobile-controls.js';
@@ -62,7 +63,7 @@ $('#app').innerHTML=`
 <div class="range-pair"><label>Mosaic width<select id="mx"><option value="1">1× · single</option><option value="1.4">1.4×</option><option value="1.8">1.8× · maximum</option></select></label><label>Mosaic height<select id="my"><option value="1">1× · single</option><option value="1.4">1.4×</option><option value="1.8">1.8× · maximum</option></select></label></div>
 <label>Mount mode</label><div class="segmented" aria-label="Mount mode"><button id="altazMode" type="button">Alt-Az</button><button id="eqMode" type="button">EQ</button></div><p id="orientationReadout" class="hint"></p><p class="hint">Alt-Az follows the local horizon; EQ follows celestial north. Ideal alignment with zero camera roll; actual sensor orientation may have a fixed offset.</p><p id="equipmentError" role="alert" class="error"></p><button id="resetEquipment" class="secondary wide">Reset Mini preset</button></details></div>
 <footer class="side-footer"><a href="./credits.html" target="_blank" rel="noopener">Sources & open-source credits ↗</a><span>Manual visible-sky patch</span></footer></aside>
-<section class="map" aria-label="Interactive sky map"><canvas id="sky" tabindex="0" aria-label="Sky map. Drag to pan, scroll to zoom. Arrow keys pan, plus and minus zoom. Search or the object list provides keyboard object selection."></canvas><canvas id="overlay" aria-hidden="true"></canvas>
+<section class="map" aria-label="Interactive sky map"><canvas id="sky" tabindex="0" aria-label="Sky map. Drag to pan, scroll to zoom. Arrow keys pan, plus and minus zoom. Search or the object list provides keyboard object selection."></canvas><div id="skyLight" aria-hidden="true"></div><canvas id="overlay" aria-hidden="true"></canvas>
 <button id="sidebarToggle" aria-expanded="false" aria-label="Open planning drawer">Plan</button><button id="viewMenu" aria-expanded="false">View ▾</button><div class="map-toolbar"><div class="segmented" aria-label="Object display"><button id="outlines" class="active" aria-pressed="true">Dots</button><button id="thumbnails" aria-pressed="false">Thumbnails</button></div><button id="outlineToggle" aria-pressed="true">Object outlines</button><button id="grid" aria-pressed="false">Grid</button><button id="ground" class="active" aria-pressed="true">Ground</button><div class="constellation-controls"><span>Constellations</span><div class="segmented"><button data-constellations="off">Off</button><button data-constellations="focus">Focus</button><button data-constellations="full">Full</button></div></div><button id="survey" class="active" aria-pressed="true">Survey</button></div>
 <div id="patchDrawing" class="patch-drawing" hidden><span id="patchDrawHint">Tap corners, then Finish. Desktop: hold Space and drag to pan; scroll to zoom. Mobile: use two fingers to pan and pinch.</span><button id="undoPatch">Undo</button><button id="finishPatch">Finish</button><button id="cancelPatch">Cancel</button></div><div id="skyContext" class="sky-context"></div><div id="message" role="status" class="map-message">Loading the planetarium…</div>
 <div class="map-navigation"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="wideView" title="Return to a wide sky view">Wide</button><button id="frameTarget" disabled>Frame target</button></div>
@@ -152,7 +153,8 @@ function recompute(){
 }
 function updateContext(){
  const obs=new Astronomy.Observer(state.lat,state.lon,0),sun=Astronomy.Equator('Sun',state.date,obs,true,true),h=Astronomy.Horizon(state.date,obs,sun.ra,sun.dec);
- $('#skyContext').textContent=h.altitude>0?'Daytime · previewing the sky without daylight':h.altitude>-18?'Twilight · sky not fully dark':'Astronomical night';
+ const light=skyLight(h.altitude);$('#skyLight').style.backgroundColor=`rgb(${light.rgb.join(',')})`;
+ $('#skyContext').textContent=light.phase+(h.altitude>-18?' · stars and objects kept visible':'');
 }
 function setTime(date,reset=false){if(Number.isNaN(date.getTime()))return;state.date=date;if(reset){timelineBase=new Date(date);$('#timeSlider').value=0;$('#timeOffset').textContent='±12 hours';}syncDate();recompute();}
 function switchTab(tab){state.tab=tab;for(const mode of panelModes){$('#'+mode+'Panel').hidden=mode!==tab;$('#'+mode+'Tab').classList.toggle('active',mode===tab);$('#'+mode+'Tab').setAttribute('aria-pressed',String(mode===tab));}$('#sidebar').scrollTop=0;}

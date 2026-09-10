@@ -7,10 +7,8 @@
 A local-first astrophotography planner built around Stellarium Web Engine. Explore the sky, discover deep-sky targets and preview their true angular size in a DWARF Mini frame.
 
 <!-- release:start -->
-## Latest release · 0.6.0 — 2026-09-10
-- Edit My Sky corners by dragging them, with Save, Cancel and Redraw from scratch.
-- Keep the sky patch filter active independently of All filters.
-- Consolidated installation, connection status, offline readiness, version history and updates in one top-bar app status button.
+## Latest release · 0.7.0 — 2026-09-10
+- Sky brightness now follows the Sun: dark nights, blue twilight and light-blue daytime, while stars and targets stay available for planning.
 
 [Full changelog](CHANGELOG.md) · [Website changelog](https://claudeschneider.github.io/skypatch/changelog.html)
 <!-- release:end -->
