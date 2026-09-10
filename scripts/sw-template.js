@@ -1,4 +1,9 @@
+const VERSION=__VERSION__;
 const CORE=__CACHE__,FILES=__FILES__;
+self.addEventListener('message',event=>{
+ if(event.data?.type==='GET_VERSION')event.ports[0]?.postMessage({version:VERSION});
+ if(event.data?.type==='SKIP_WAITING')event.waitUntil(self.skipWaiting());
+});
 const BASE=new URL('./',self.location.href),SURVEY='https://alasky.cds.unistra.fr/DSS/DSSColor/',IMAGES='skypatch-survey-v1-'+BASE.pathname;
 self.addEventListener('install',event=>event.waitUntil((async()=>{const cache=await caches.open(CORE);try{await cache.addAll(FILES.map(p=>new URL(p,BASE).href));}catch(e){await caches.delete(CORE);throw e;}})()));
 self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith('skypatch-core-'+BASE.pathname+'-')&&key!==CORE)await caches.delete(key);await self.clients.claim();})()));

@@ -8,6 +8,6 @@ for name in files:digest.update((dist/name).read_bytes())
 template=(root/'scripts/sw-template.js').read_text()
 digest.update(template.encode())
 # Scope is part of the cache name so multiple GitHub Pages projects never collide.
-template=template.replace('__CACHE__',"'skypatch-core-'+new URL('./',self.location.href).pathname+'-"+digest.hexdigest()[:16]+"'").replace('__FILES__',json.dumps(files))
+template=template.replace('__CACHE__',"'skypatch-core-'+new URL('./',self.location.href).pathname+'-"+digest.hexdigest()[:16]+"'").replace('__FILES__',json.dumps(files)).replace('__VERSION__',json.dumps(digest.hexdigest()[:12]))
 (dist/'sw.js').write_text(template)
 print(f'Offline core: {len(files)} files, {sum((dist/f).stat().st_size for f in files)/1048576:.1f} MB (source archives excluded).')

@@ -1,3 +1,4 @@
+import {installUpdates} from './updates.js';
 const SURVEY='https://alasky.cds.unistra.fr/DSS/DSSColor/';
 const LIMIT=80*1024*1024;
 export async function installOffline(){
@@ -39,6 +40,7 @@ export async function installOffline(){
  try{
   registration=await navigator.serviceWorker.register(new URL('sw.js',base),{scope:base.pathname});
   await navigator.serviceWorker.ready;
+  installUpdates(registration,dialog,()=>!!controller);
   $('#coreStatus').textContent='Core ready offline: planetarium, bundled stars, DSO catalogue and framing tools.';
   await refresh();
  }catch{registration=null;$('#coreStatus').textContent='Core download failed. Reconnect and reload to retry before going offline.';}

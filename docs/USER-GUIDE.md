@@ -26,7 +26,7 @@ Installation is optional and browser support varies. Offline caching works on de
 ## Optional imagery
 Download survey overview adds the whole-sky DSS survey through HiPS order 3, roughly one arcminute per pixel. The verified pack was 42.8 MB; a hard 80 MB cap applies. Keep the window open during download. Cancel preserves downloaded tiles and Download resumes. Remove imagery removes only that pack. Fine-detail survey imagery, target-photo previews, Wikipedia and external sources still require internet.
 
-Before leaving, verify readiness, turn off your connection and reload the app. Browser storage may be evicted; a saved app icon alone is not proof that offline data is present. To update, close all app windows and reopen while online.
+Before leaving, verify readiness, turn off your connection and reload the app. Browser storage may be evicted; a saved app icon alone is not proof that offline data is present. Open **Install / Offline** to see the installed build and select **Check for updates**. When a release is ready, choose **Update now** in the notification or offline panel; **Later** dismisses the notification. Updating reloads the app and preserves saved preferences and downloaded survey imagery. Finish or cancel an imagery download before updating. Updates require an internet connection and a successful website deployment; a repository change alone does not publish a release.
 
 ## Interpretation and privacy
 Survey images illustrate angular scale, not the result your equipment will achieve. Planet discs are geometric footprints; Saturn's rings are not represented. Use a proper solar filter before pointing a telescope at the Sun. Sky Patch does not control the telescope.
