@@ -2,6 +2,11 @@
 
 Every new commit receives an incremented version. Earlier commits are recorded below without rewriting their history.
 
+## 0.3.0 — 2026-09-09
+
+- Pan and zoom while drawing a sky patch: Space-drag and scroll on desktop, or two-finger pan/pinch on mobile. Single taps add corners.
+- Fixed the release helper so version bumps run correctly.
+
 ## 0.2.0 — 2026-09-09
 
 - Added a public website changelog and a latest-release summary on GitHub.

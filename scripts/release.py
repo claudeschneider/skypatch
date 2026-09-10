@@ -25,9 +25,9 @@ if sys.argv[1:]==['check']:
  print('Release versions and changelogs verified for',len(commits),'commits.');sys.exit()
 if len(sys.argv)<3 or sys.argv[1] not in ['patch','minor','major']:
  sys.exit('Usage: npm run release -- patch "User-facing change" ["Another change"]')
- kind,*notes=sys.argv[1:];data=json.loads(package.read_text());numbers=list(map(int,data['version'].split('.')));index=['major','minor','patch'].index(kind);numbers[index]+=1
- for i in range(index+1,3):numbers[i]=0
- version='.'.join(map(str,numbers));data['version']=version;package.write_text(json.dumps(data,indent=2)+'\n')
- lock=root/'package-lock.json';data=json.loads(lock.read_text());data['version']=version;data['packages']['']['version']=version;lock.write_text(json.dumps(data,indent=2)+'\n')
- content=log.read_text();pos=content.index('\n## ');entry='\n## '+version+' — '+datetime.date.today().isoformat()+'\n\n'+'\n'.join('- '+note for note in notes)+'\n'
- log.write_text(content[:pos]+entry+content[pos:]);sync();print('Prepared version '+version+'; review the changelog and landing page before committing.')
+kind,*notes=sys.argv[1:];data=json.loads(package.read_text());numbers=list(map(int,data['version'].split('.')));index=['major','minor','patch'].index(kind);numbers[index]+=1
+for i in range(index+1,3):numbers[i]=0
+version='.'.join(map(str,numbers));data['version']=version;package.write_text(json.dumps(data,indent=2)+'\n')
+lock=root/'package-lock.json';data=json.loads(lock.read_text());data['version']=version;data['packages']['']['version']=version;lock.write_text(json.dumps(data,indent=2)+'\n')
+content=log.read_text();pos=content.index('\n## ');entry='\n## '+version+' — '+datetime.date.today().isoformat()+'\n\n'+'\n'.join('- '+note for note in notes)+'\n'
+log.write_text(content[:pos]+entry+content[pos:]);sync();print('Prepared version '+version+'; review the changelog and landing page before committing.')

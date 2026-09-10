@@ -13,6 +13,8 @@ Pan to your view and choose Draw patch. Click or tap corners, then Finish. Undo 
 ## Mobile controls
 Use Plan to open the bottom drawer. Swipe the drawer header upward to expand; swipe down to collapse/dismiss, or tap the header to close. The View button contains map layers. One finger pans; pinching zooms around the viewport centre. Tap an object to open its details. Rotate the device if you prefer landscape.
 
+While drawing a sky patch, hold Space and drag to pan on desktop; scroll to zoom. On mobile, tap to add corners and use two fingers to pan and pinch.
+
 ## Install and prepare for offline use
 Open the app online and select Install / Offline near the bottom of the panel, or use the landing page's installation button. Wait for Core ready offline. This saves the planetarium, bundled bright stars, DSO catalogue and framing tools (about 9.6 MB).
 

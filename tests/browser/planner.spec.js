@@ -172,3 +172,21 @@ test('Multi-type choices, equipment presets, constellation modes and bundled des
  await page.locator('#equipmentPreset').selectOption('ff24');expect(await page.evaluate(()=>skyPatch.state.equipment.width)).toBeCloseTo(73.7398,3);await page.locator('#equipmentPreset').selectOption('s30pro');expect(await page.evaluate(()=>skyPatch.state.equipment.width<skyPatch.state.equipment.height)).toBe(true);
  await page.reload();await page.waitForFunction(()=>window.skyPatch);expect(await page.evaluate(()=>skyPatch.state.equipment.preset)).toBe('s30pro');expect(await page.evaluate(()=>skyPatch.state.filters.types)).toEqual(['Emission nebula','Galaxy']);
 });
+
+test('Patch drawing supports Space-pan and wheel zoom without extra corners',async({page})=>{
+ await start(page);await page.locator('#drawPatch').click();const r=await page.locator('#overlay').boundingBox(),x=r.x+r.width*.4,y=r.y+r.height*.3;
+ await page.mouse.click(x,y);const before=await page.evaluate(()=>({yaw:skyPatch.engine.stel.core.observer.yaw,fov:skyPatch.engine.fov}));
+ await page.keyboard.down('Space');await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+80,y+20,{steps:5});await page.mouse.up();await page.keyboard.up('Space');
+ expect(await page.evaluate(()=>skyPatch.engine.stel.core.observer.yaw)).not.toBe(before.yaw);
+ await page.mouse.wheel(0,-100);expect(await page.evaluate(()=>skyPatch.engine.fov)).toBeLessThan(before.fov);
+ await page.locator('#undoPatch').click();await expect(page.locator('#undoPatch')).toBeDisabled();await expect(page.locator('#patchDrawing')).toBeVisible();
+});
+test('Mobile patch taps add corners while two fingers pan and zoom without adding corners',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});const page=await context.newPage();await start(page);await page.locator('#sidebarToggle').tap();await page.locator('#drawPatch').tap();
+ const client=await context.newCDPSession(page),touch=(type,points)=>client.send('Input.dispatchTouchEvent',{type,touchPoints:points.map(([x,y],id)=>({x,y,id}))});
+ await touch('touchStart',[[120,240]]);await touch('touchEnd',[]);await expect(page.locator('#undoPatch')).toBeEnabled();
+ const before=await page.evaluate(()=>({yaw:skyPatch.engine.stel.core.observer.yaw,fov:skyPatch.engine.fov}));
+ await touch('touchStart',[[100,250],[220,250]]);await touch('touchMove',[[110,260],[290,260]]);await touch('touchEnd',[]);
+ expect(await page.evaluate(()=>skyPatch.engine.stel.core.observer.yaw)).not.toBe(before.yaw);expect(await page.evaluate(()=>skyPatch.engine.fov)).toBeLessThan(before.fov);
+ await page.locator('#undoPatch').tap();await expect(page.locator('#undoPatch')).toBeDisabled();await context.close();
+});
