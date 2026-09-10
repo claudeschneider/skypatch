@@ -1,6 +1,6 @@
 {
   "name": "skypatch",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
@@ -11,7 +11,8 @@
     "test": "node --test tests/*.test.js",
     "test:browser": "playwright test",
     "source": "python3 scripts/package-source.py",
-    "test:pwa": "playwright test --config playwright.pwa.config.js"
+    "test:pwa": "playwright test --config playwright.pwa.config.js",
+    "release": "python3 scripts/release.py"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

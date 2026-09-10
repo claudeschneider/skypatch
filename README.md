@@ -6,6 +6,15 @@
 
 A local-first astrophotography planner built around Stellarium Web Engine. Explore the sky, discover deep-sky targets and preview their true angular size in a DWARF Mini frame.
 
+<!-- release:start -->
+## Latest release · 0.2.0 — 2026-09-09
+- Added a public website changelog and a latest-release summary on GitHub.
+- App updates now show a readable release version alongside the build identifier.
+- Refreshed the feature tour for multiple object types, equipment presets, constellation modes and PWA updates.
+
+[Full changelog](CHANGELOG.md) · [Website changelog](https://claudeschneider.github.io/skypatch/changelog.html)
+<!-- release:end -->
+
 ## Run locally
 
 Requires Node.js 20.19+ (Node 22 recommended) and Python 3 for packaging downloadable source.
