@@ -22,3 +22,7 @@ export function installMobilePrompt(open){
   if(!installed&&mobile.matches&&!seen&&!document.querySelector('dialog[open]')){prompt.hidden=false;try{localStorage.setItem('skypatch-install-prompt-seen','true');}catch{}}
  },4000);
 }
+
+// iOS also emits gesture events when a pinch starts over UI or crosses the map edge.
+for(const type of ['gesturestart','gesturechange','gestureend'])document.addEventListener(type,event=>event.preventDefault(),{passive:false});
+document.addEventListener('touchmove',event=>{if(event.touches.length>1)event.preventDefault();},{passive:false});

@@ -10,11 +10,11 @@ test('Engine integration: arbitrary dates, locations, pan and zoom, projected ta
  await page.locator('#date').fill('2027-01-12T21:00');await page.locator('#date').blur();expect(await page.evaluate(()=>skyPatch.state.date.getFullYear())).toBe(2027);expect(errors).toEqual([]);
 });
 test('Filters, excluded search, mosaic preview and full-object bounds',async({page})=>{
- await start(page);await page.locator('#search').fill('M57');await page.locator('[data-object="M57"]').click();await expect(page.locator('#selection')).toContainText('19 pixels');await expect(page.locator('#selection')).toContainText('Excluded by: Angular size');await page.locator('#inspectFrame').click();
- await page.locator('#mx').selectOption('1.8');await page.locator('#my').selectOption('1.8');await expect(page.locator('#selection')).toContainText('3.852° × 2.160°');
- await page.locator('#search').fill('north america');await page.locator('[data-object="NGC7000"]').click();await page.locator('#inspectFrame').click();
+ await start(page);await page.locator('#exploreTab').click();await page.locator('#search').fill('M57');await page.locator('[data-object="M57"]').click();await expect(page.locator('#selection')).toContainText('19 pixels');await expect(page.locator('#selection')).toContainText('Excluded by: Angular size');await page.locator('#inspectFrame').click();
+ await page.locator('#framingTab').click();await page.locator('#mx').selectOption('1.8');await page.locator('#framingTab').click();await page.locator('#my').selectOption('1.8');await expect(page.locator('#selection')).toContainText('3.852° × 2.160°');
+ await page.locator('#exploreTab').click();await page.locator('#search').fill('north america');await page.locator('[data-object="NGC7000"]').click();await page.locator('#inspectFrame').click();
  const bounds=await page.evaluate(()=>{const s=skyPatch,r=document.querySelector('#sky').getBoundingClientRect(),m=s.engine.matrix('VIEW');return s.state.selected.extent.map(v=>s.engine.project(v,r.width,r.height,m)).every(p=>p&&p[0]>=0&&p[0]<=r.width&&p[1]>=0&&p[1]<=r.height);});expect(bounds).toBe(true);
- await page.locator('#search').fill('');await page.locator('#sizeMin').fill('99999');await page.locator('#sizeMin').blur();await page.locator('#unknown').uncheck();await page.locator('#showSolar').uncheck();await expect(page.locator('#results')).toContainText('No objects pass');await page.locator('#relax').click();expect(await page.evaluate(()=>skyPatch.filtered.length)).toBeGreaterThan(1000);
+ await page.locator('#exploreTab').click();await page.locator('#search').fill('');await page.locator('#filtersTab').click();await page.locator('#sizeMin').fill('99999');await page.locator('#sizeMin').blur();await page.locator('#filtersTab').click();await page.locator('#unknown').uncheck();await page.locator('#filtersTab').click();await page.locator('#showSolar').uncheck();await page.locator('#exploreTab').click();await expect(page.locator('#results')).toContainText('No objects pass');await page.locator('#exploreTab').click();await page.locator('#relax').click();expect(await page.evaluate(()=>skyPatch.filtered.length)).toBeGreaterThan(1000);
 });
 test('Location and equipment persist, mobile map remains accessible',async({page})=>{
  await start(page);await page.locator('#framingTab').click();await page.locator('#mx').selectOption('1.8');await page.reload();await page.waitForFunction(()=>!!window.skyPatch);expect(await page.evaluate(()=>skyPatch.state.equipment.mx)).toBe(1.8);
@@ -40,7 +40,7 @@ test('Centred frame follows panning; Alt-Az stays level and EQ follows celestial
  });
  expect(Math.abs(result.first.cx)).toBeLessThan(.1);expect(Math.abs(result.first.cy)).toBeLessThan(.1);expect(Math.abs(result.second.cx)).toBeLessThan(.1);expect(result.first.edge).toBeLessThan(.1);expect(result.second.edge).toBeLessThan(.1);expect(result.eq.edge).toBeGreaterThan(5);expect(result.first.ra).not.toBe(result.second.ra);
  await page.locator('#framingTab').click();await page.locator('#eqMode').click();await expect(page.locator('#eqMode')).toHaveAttribute('aria-pressed','true');
- const before=await page.evaluate(()=>skyPatch.engine.framing('eq'));await page.locator('#mx').selectOption('1.8');const after=await page.evaluate(()=>skyPatch.engine.framing('eq'));expect(after.ra).toBeCloseTo(before.ra,6);expect(after.dec).toBeCloseTo(before.dec,6);
+ const before=await page.evaluate(()=>skyPatch.engine.framing('eq'));await page.locator('#framingTab').click();await page.locator('#mx').selectOption('1.8');const after=await page.evaluate(()=>skyPatch.engine.framing('eq'));expect(after.ra).toBeCloseTo(before.ra,6);expect(after.dec).toBeCloseTo(before.dec,6);
  await page.reload();await page.waitForFunction(()=>!!window.skyPatch);expect(await page.evaluate(()=>skyPatch.state.mountMode)).toBe('eq');
 });
 test('Outlines toggle independently from discovery markers and camera footprints',async({page})=>{
@@ -53,14 +53,14 @@ test('Solar bodies have physical disc sizes and update with observer time',async
  await start(page);
  const initial=await page.evaluate(()=>Object.fromEntries(skyPatch.objects.filter(o=>o.solar).map(o=>[o.id,{ra:o.ra,diam:o.major,pixels:o.major/60/2.14*1920}])));
  expect(Object.keys(initial)).toHaveLength(9);expect(initial.Sun.diam).toBeGreaterThan(30);expect(initial.Sun.diam).toBeLessThan(33);expect(initial.Moon.diam).toBeGreaterThan(28);expect(initial.Moon.diam).toBeLessThan(35);expect(initial.Jupiter.pixels).toBeLessThan(14);expect(initial.Mars.pixels).toBeLessThan(7);
- await page.locator('#solarShortcuts').getByRole('button',{name:'Moon',exact:true}).click();await expect(page.locator('#selection')).toContainText('Disc diameter');await expect(page.locator('#targetPhoto')).toHaveCount(0);
+ await page.locator('#filtersTab').click();await page.locator('#solarShortcuts').getByRole('button',{name:'Moon',exact:true}).click();await expect(page.locator('#selection')).toContainText('Disc diameter');await expect(page.locator('#targetPhoto')).toHaveCount(0);
  const measurement=await page.evaluate(async()=>{const G=await import('/src/geometry.js'),s=skyPatch,o=s.state.selected,e=s.engine,r=document.querySelector('#sky').getBoundingClientRect(),m=e.matrix('VIEW');const xy=o.extent.map(v=>e.project(v,r.width,r.height,null));return {diameter:2*Math.max(...o.extent.map(v=>G.separation(o.v,v)))*60,expected:o.major,finite:xy.every(p=>p&&p.every(Number.isFinite))};});expect(measurement.finite).toBe(true);expect(measurement.diameter).toBeCloseTo(measurement.expected,4);
  await page.evaluate(()=>skyPatch.setTime(new Date('2026-09-24T05:00Z'),true));expect(await page.evaluate(()=>skyPatch.state.selected.ra)).not.toBe(initial.Moon.ra);expect(await page.evaluate(()=>skyPatch.state.selected.major)).not.toBe(initial.Moon.diam);
- await page.locator('#search').fill('Sun');await page.locator('[data-object="Sun"]').click();await expect(page.locator('#selection')).toContainText('solar filter');
+ await page.locator('#exploreTab').click();await page.locator('#search').fill('Sun');await page.locator('[data-object="Sun"]').click();await expect(page.locator('#selection')).toContainText('solar filter');
 });
 test('Solar layer is independent of DSO size filters but respects horizon and visibility toggle',async({page})=>{
  await start(page);await page.evaluate(()=>{skyPatch.state.filters={...skyPatch.state.filters,above:false,altMin:-90,sizeMin:99999,unknown:false};skyPatch.recompute();});expect(await page.evaluate(()=>skyPatch.filtered.filter(o=>o.solar).length)).toBe(9);
- await page.locator('#showSolar').uncheck();expect(await page.evaluate(()=>skyPatch.filtered.filter(o=>o.solar).length)).toBe(0);
+ await page.locator('#filtersTab').click();await page.locator('#showSolar').uncheck();expect(await page.evaluate(()=>skyPatch.filtered.filter(o=>o.solar).length)).toBe(0);
  await page.reload();await page.waitForFunction(()=>window.skyPatch);await expect(page.locator('#showSolar')).not.toBeChecked();
 });
 
@@ -116,23 +116,23 @@ test('Object information handles missing articles and network errors on mobile',
 });
 test('Filter switches pause and restore values, individual choices and solar altitude filtering',async({page})=>{
  await start(page);
- await page.locator('#sizeMin').fill('30');await page.locator('#sizeMin').blur();
+ await page.locator('#filtersTab').click();await page.locator('#sizeMin').fill('30');await page.locator('#sizeMin').blur();
  await page.locator('#sizeEnabled').uncheck();await expect(page.locator('#sizeMin')).toBeDisabled();
  const prior=await page.evaluate(()=>skyPatch.filtered.map(o=>o.id));
- await page.locator('#filtersEnabled').uncheck();
+ await page.locator('#filtersTab').click();await page.locator('#filtersEnabled').uncheck();
  expect(await page.evaluate(()=>skyPatch.filtered.length===skyPatch.objects.length)).toBe(true);
  await expect(page.locator('#altMin')).toBeDisabled();await expect(page.locator('#sizeMin')).toHaveValue('30');
- await page.locator('#filtersEnabled').check();await expect(page.locator('#sizeEnabled')).not.toBeChecked();await expect(page.locator('#altMin')).toBeEnabled();
+ await page.locator('#filtersTab').click();await page.locator('#filtersEnabled').check();await expect(page.locator('#sizeEnabled')).not.toBeChecked();await expect(page.locator('#altMin')).toBeEnabled();
  expect(await page.evaluate(()=>skyPatch.filtered.map(o=>o.id))).toEqual(prior);
  await page.locator('#sizeEnabled').check();await expect(page.locator('#sizeMin')).toHaveValue('30');
  await page.locator('#altEnabled').uncheck();expect(await page.evaluate(()=>skyPatch.filtered.filter(o=>o.solar).length)).toBe(9);
- await page.locator('#filtersEnabled').uncheck();await page.reload();await page.waitForFunction(()=>!!window.skyPatch);
+ await page.locator('#filtersTab').click();await page.locator('#filtersEnabled').uncheck();await page.reload();await page.waitForFunction(()=>!!window.skyPatch);
  await expect(page.locator('#filtersEnabled')).not.toBeChecked();await expect(page.locator('#altEnabled')).not.toBeChecked();await expect(page.locator('#sizeMin')).toHaveValue('30');
- await page.locator('#filtersEnabled').check();await expect(page.locator('#altMin')).toBeDisabled();await expect(page.locator('#sizeMin')).toBeEnabled();
+ await page.locator('#filtersTab').click();await page.locator('#filtersEnabled').check();await expect(page.locator('#altMin')).toBeDisabled();await expect(page.locator('#sizeMin')).toBeEnabled();
 });
 
 test('Visible sky polygon drawing, horizon anchoring, pause and persistence',async({page})=>{
- await start(page);await page.locator('#drawPatch').click();const r=await page.locator('#overlay').boundingBox();
+ await start(page);await page.locator('#patchTab').click();await page.locator('#drawPatch').click();const r=await page.locator('#overlay').boundingBox();
  for(const [x,y] of [[.3,.3],[.7,.3],[.7,.6],[.3,.6]])await page.mouse.click(r.x+r.width*x,r.y+r.height*y);
  await page.locator('#finishPatch').click();await expect(page.locator('#patchEnabled')).toBeChecked();
  const vertices=await page.evaluate(()=>skyPatch.state.patch.vertices);
@@ -140,11 +140,11 @@ test('Visible sky polygon drawing, horizon anchoring, pause and persistence',asy
  await page.evaluate(()=>skyPatch.setTime(new Date(+skyPatch.state.date+6*3600000),true));
  expect(await page.evaluate(()=>skyPatch.state.patch.vertices)).toEqual(vertices);
  expect(await page.evaluate(()=>skyPatch.objects.filter(o=>o.reasons.includes('Outside sky patch')).map(o=>o.id))).not.toEqual(before);
- await page.locator('#patchEnabled').uncheck();expect(await page.evaluate(()=>skyPatch.objects.some(o=>o.reasons.includes('Outside sky patch')))).toBe(false);
- await page.locator('#patchEnabled').check();await page.locator('#filtersEnabled').uncheck();expect(await page.evaluate(()=>skyPatch.objects.some(o=>o.reasons.includes('Outside sky patch')))).toBe(false);
- await page.locator('#filtersEnabled').check();await page.locator('#drawPatch').click();await page.locator('#cancelPatch').click();expect(await page.evaluate(()=>skyPatch.state.patch.vertices)).toEqual(vertices);
+ await page.locator('#patchTab').click();await page.locator('#patchEnabled').uncheck();expect(await page.evaluate(()=>skyPatch.objects.some(o=>o.reasons.includes('Outside sky patch')))).toBe(false);
+ await page.locator('#patchTab').click();await page.locator('#patchEnabled').check();await page.locator('#filtersTab').click();await page.locator('#filtersEnabled').uncheck();expect(await page.evaluate(()=>skyPatch.objects.some(o=>o.reasons.includes('Outside sky patch')))).toBe(false);
+ await page.locator('#filtersTab').click();await page.locator('#filtersEnabled').check();await page.locator('#patchTab').click();await page.locator('#drawPatch').click();await page.locator('#cancelPatch').click();expect(await page.evaluate(()=>skyPatch.state.patch.vertices)).toEqual(vertices);
  await page.reload();await page.waitForFunction(()=>!!window.skyPatch);await expect(page.locator('#patchEnabled')).toBeChecked();expect(await page.evaluate(()=>skyPatch.state.patch.vertices)).toEqual(vertices);
- await page.locator('#clearPatch').click();await expect(page.locator('#patchEnabled')).toBeDisabled();
+ await page.locator('#patchTab').click();await page.locator('#clearPatch').click();await expect(page.locator('#patchEnabled')).toBeDisabled();
 });
 
 test('Mobile bottom drawer, compact toolbar and centred touch pinch',async({browser})=>{
@@ -162,19 +162,19 @@ test('Mobile bottom drawer, compact toolbar and centred touch pinch',async({brow
 
 test('Multi-type choices, equipment presets, constellation modes and bundled descriptions',async({page})=>{
  await start(page);await expect(page.getByRole('button',{name:'Hide panel',exact:true})).toHaveCount(0);await expect(page.locator('#sidebarToggle')).toBeHidden();
- await page.locator('#typeSummary').click();await page.locator('#noTypes').click();await page.locator('[data-type="Galaxy"]').check();await page.locator('[data-type="Emission nebula"]').check();
+ await page.locator('#filtersTab').click();await page.locator('#typeSummary').click();await page.locator('#filtersTab').click();await page.locator('#noTypes').click();await page.locator('[data-type="Galaxy"]').check();await page.locator('[data-type="Emission nebula"]').check();
  expect(await page.evaluate(()=>skyPatch.state.filters.types)).toEqual(['Emission nebula','Galaxy']);expect(await page.evaluate(()=>skyPatch.filtered.filter(o=>!o.solar).every(o=>['Emission nebula','Galaxy'].includes(o.type)))).toBe(true);
  await page.locator('#typesEnabled').uncheck();await expect(page.locator('[data-type="Galaxy"]')).toBeDisabled();await page.locator('#typesEnabled').check();await expect(page.locator('[data-type="Galaxy"]')).toBeChecked();
  await page.locator('[data-constellations="full"]').click();expect(await page.evaluate(()=>skyPatch.engine.stel.core.constellations.show_only_pointed)).toBe(false);
  await page.locator('[data-constellations="off"]').click();expect(await page.evaluate(()=>skyPatch.engine.stel.core.constellations.lines_visible)).toBe(false);
  await page.locator('[data-constellations="focus"]').click();expect(await page.evaluate(()=>skyPatch.engine.stel.core.constellations.show_only_pointed)).toBe(true);
  await page.evaluate(()=>skyPatch.select(skyPatch.objects.find(o=>o.id==='M33')));await expect(page.locator('#selection')).toContainText('NGC 598');await expect(page.locator('.object-description')).toContainText('Triangulum');
- await page.locator('#equipmentPreset').selectOption('ff24');expect(await page.evaluate(()=>skyPatch.state.equipment.width)).toBeCloseTo(73.7398,3);await page.locator('#equipmentPreset').selectOption('s30pro');expect(await page.evaluate(()=>skyPatch.state.equipment.width<skyPatch.state.equipment.height)).toBe(true);
+ await page.locator('#framingTab').click();await page.locator('#equipmentPreset').selectOption('ff24');expect(await page.evaluate(()=>skyPatch.state.equipment.width)).toBeCloseTo(73.7398,3);await page.locator('#framingTab').click();await page.locator('#equipmentPreset').selectOption('s30pro');expect(await page.evaluate(()=>skyPatch.state.equipment.width<skyPatch.state.equipment.height)).toBe(true);
  await page.reload();await page.waitForFunction(()=>window.skyPatch);expect(await page.evaluate(()=>skyPatch.state.equipment.preset)).toBe('s30pro');expect(await page.evaluate(()=>skyPatch.state.filters.types)).toEqual(['Emission nebula','Galaxy']);
 });
 
 test('Patch drawing supports Space-pan and wheel zoom without extra corners',async({page})=>{
- await start(page);await page.locator('#drawPatch').click();const r=await page.locator('#overlay').boundingBox(),x=r.x+r.width*.4,y=r.y+r.height*.3;
+ await start(page);await page.locator('#patchTab').click();await page.locator('#drawPatch').click();const r=await page.locator('#overlay').boundingBox(),x=r.x+r.width*.4,y=r.y+r.height*.3;
  await page.mouse.click(x,y);const before=await page.evaluate(()=>({yaw:skyPatch.engine.stel.core.observer.yaw,fov:skyPatch.engine.fov}));
  await page.keyboard.down('Space');await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+80,y+20,{steps:5});await page.mouse.up();await page.keyboard.up('Space');
  expect(await page.evaluate(()=>skyPatch.engine.stel.core.observer.yaw)).not.toBe(before.yaw);
@@ -182,7 +182,7 @@ test('Patch drawing supports Space-pan and wheel zoom without extra corners',asy
  await page.locator('#undoPatch').click();await expect(page.locator('#undoPatch')).toBeDisabled();await expect(page.locator('#patchDrawing')).toBeVisible();
 });
 test('Mobile patch taps add corners while two fingers pan and zoom without adding corners',async({browser})=>{
- const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});const page=await context.newPage();await start(page);await page.locator('#sidebarToggle').tap();await page.locator('#drawPatch').tap();
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});const page=await context.newPage();await start(page);await page.locator('#sidebarToggle').tap();await page.locator('#patchTab').click();await page.locator('#drawPatch').tap();
  const client=await context.newCDPSession(page),touch=(type,points)=>client.send('Input.dispatchTouchEvent',{type,touchPoints:points.map(([x,y],id)=>({x,y,id}))});
  await touch('touchStart',[[120,240]]);await touch('touchEnd',[]);await expect(page.locator('#undoPatch')).toBeEnabled();
  const before=await page.evaluate(()=>({yaw:skyPatch.engine.stel.core.observer.yaw,fov:skyPatch.engine.fov}));

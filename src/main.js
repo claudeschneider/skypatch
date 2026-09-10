@@ -1,3 +1,4 @@
+import {arrangePanels,panelModes} from './panel-layout.js';
 import {installTimeToggle} from './mobile-controls.js';
 import {installPatchInput} from './patch-input.js';
 import {equipmentPresets,selectedEquipment} from './equipment.js';
@@ -92,6 +93,7 @@ function syncFilterSwitches(){
  $('#filterToggleStatus').textContent=enabled?'Switch filters off without losing their values.':'Filters paused · your settings are saved. Ground still hides the sky below the horizon.';
 }
 $('#filtersEnabled').onchange=event=>{state.filters.enabled=event.target.checked;syncFilterSwitches();recompute();};
+arrangePanels();
 function syncPatchControls(){
  $('#patchEnabled').checked=state.patch.enabled;$('#patchEnabled').disabled=!patchContains||drawingPatch;
  $('#drawPatch').textContent=patchContains?'Redraw patch':'Draw patch';$('#drawPatch').disabled=drawingPatch;$('#clearPatch').disabled=!patchContains||drawingPatch;
@@ -142,8 +144,8 @@ function updateContext(){
  $('#skyContext').textContent=h.altitude>0?'Daytime · previewing the sky without daylight':h.altitude>-18?'Twilight · sky not fully dark':'Astronomical night';
 }
 function setTime(date,reset=false){if(Number.isNaN(date.getTime()))return;state.date=date;if(reset){timelineBase=new Date(date);$('#timeSlider').value=0;$('#timeOffset').textContent='±12 hours';}syncDate();recompute();}
-function switchTab(tab){state.tab=tab;$('#explorePanel').hidden=tab!=='explore';$('#framingPanel').hidden=tab!=='framing';$('#exploreTab').classList.toggle('active',tab==='explore');$('#framingTab').classList.toggle('active',tab==='framing');}
-function select(o,frame=false){if(matchMedia('(max-width:650px)').matches&&$('.workspace').classList.contains('panel-hidden'))$('#sidebarToggle').click();state.selected=o;$('#frameTarget').disabled=false;engine.center(o);switchTab('framing');renderSelection();if(frame)frameTarget();}
+function switchTab(tab){state.tab=tab;for(const mode of panelModes){$('#'+mode+'Panel').hidden=mode!==tab;$('#'+mode+'Tab').classList.toggle('active',mode===tab);$('#'+mode+'Tab').setAttribute('aria-pressed',String(mode===tab));}$('#sidebar').scrollTop=0;}
+function select(o,frame=false){if(matchMedia('(max-width:650px)').matches&&$('.workspace').classList.contains('panel-hidden'))$('#sidebarToggle').click();state.selected=o;$('#frameTarget').disabled=false;engine.center(o);switchTab('info');renderSelection();$('#sidebar').scrollTop=0;if(frame)frameTarget();}
 function frameTarget(){if(!state.selected)return;const e=state.equipment;engine.center(state.selected);engine.zoom(fitFov(state.selected,e.width*e.mx,e.height*e.my,engine.framing(state.mountMode).angle));}
 function renderSelection(){
  const o=state.selected;if(!o)return;if(o.solar){renderSolarSelection(o);return;}
@@ -153,6 +155,7 @@ function renderSelection(){
  <div class="photo-preview"><img id="targetPhoto" alt="DSS survey around ${escape(o.name)}; ${fmt(fov,2)}° wide" src="${imageUrl(o,fov)}"><span class="photo-state" id="photoState">Loading survey…</span></div><p class="object-description">${escape(objectDescriptions[o.id]?.text||catalogueDescription(o))}</p><p class="hint">${objectDescriptions[o.id]?`<a href="${escape(objectDescriptions[o.id].url)}" target="_blank" rel="noopener">Wikipedia contributors</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a> · saved offline`:'Catalogue overview · OpenNGC · saved offline'}</p>
  <button id="inspectFrame" class="primary wide">Frame target on the sky</button>
  <dl><div><dt>Altitude / azimuth</dt><dd>${fmt(h.alt)}° / ${fmt(h.az)}°</dd></div><div><dt>Magnitude ${o.band||''}</dt><dd>${fmt(o.mag,2)}</dd></div><div><dt>Angular extent</dt><dd>${fmt(o.major,2)}′ ${o.minor?'× '+fmt(o.minor,2)+'′':''}</dd></div><div><dt>Frame width filled</dt><dd>${fill==null?'Unknown':fmt(fill,0)+'%'}</dd></div><div><dt>Long-axis sampling</dt><dd>${o.major==null?'Unknown':'≈ '+(e.pixels?Math.round(o.major/60/e.width*e.pixels)+' pixels':'Unknown sensor sampling')}</dd></div><div><dt>Surface brightness B</dt><dd>${o.sb==null?'Unknown':fmt(o.sb,2)+' mag/arcsec²'}</dd></div><div><dt>Composition</dt><dd>${fmt(e.width*e.mx,3)}° × ${fmt(e.height*e.my,3)}°</dd></div></dl><p class="hint">${o.outline?'Sourced OpenNGC contour.':o.major?'Catalogue ellipse; '+(o.pa==null?'position angle unknown.':'position angle '+o.pa+'°.'):'Angular extent unknown; shown as a discovery dot.'} ${o.minor==null&&o.major?'Minor axis unknown; circular approximation.':''} Size describes extent, not resolved detail.</p>`;
+ if($('#selection .object-description'))$('#selection .photo-preview').before($('#selection .object-description'));
  attachObjectInfo(o);
  $('#inspectFrame').onclick=frameTarget;
  $('#targetPhoto').onload=()=>{$('#photoState').hidden=true;};
@@ -167,6 +170,7 @@ function renderSolarSelection(o){
  <button id="inspectFrame" class="primary wide">Frame ${escape(o.name)} on the sky</button>
  <dl><div><dt>Disc diameter</dt><dd>${fmt(o.major,2)}′ / ${fmt(o.major*60,1)}″</dd></div><div><dt>Sampling across disc</dt><dd>${pixels==null?'Unknown':('≈ '+fmt(pixels,1)+' pixels')}</dd></div><div><dt>Single-frame width filled</dt><dd>${fmt(frameFill(o,e.width),2)}%</dd></div><div><dt>Altitude / azimuth</dt><dd>${fmt(h.alt)}° / ${fmt(h.az)}°</dd></div>${o.phase==null?'':`<div><dt>Illuminated fraction</dt><dd>${fmt(o.phase*100,1)}%</dd></div>`}<div><dt>Magnitude V</dt><dd>${fmt(o.mag,2)}</dd></div><div><dt>Composition</dt><dd>${fmt(e.width*e.mx,3)}° × ${fmt(e.height*e.my,3)}°</dd></div></dl>
  <p class="hint">${o.id==='Saturn'?'Globe diameter only; rings are not included. ':''}A tiny cross marks an unresolved disc at wide zoom; it is not an enlarged planet. Sampling does not imply resolved detail.</p>`;
+ if($('#selection .object-description'))$('#selection .photo-preview').before($('#selection .object-description'));
  attachObjectInfo(o);
  $('#inspectFrame').onclick=frameTarget;
 }
@@ -256,7 +260,7 @@ function draw(timestamp){
  if(timestamp%600<40)renderResults();
 }
 
-for(const id of ['explore','framing'])$('#'+id+'Tab').onclick=()=>{switchTab(id);renderResults(true);};
+for(const id of panelModes)$('#'+id+'Tab').onclick=()=>{switchTab(id);renderResults(true);};
 $('#showSolar').onchange=e=>{state.showSolar=e.target.checked;recompute();};
 $('#search').oninput=e=>{state.search=e.target.value;limit=60;switchTab('explore');renderResults(true);};
 $('#more').onclick=()=>{limit+=60;renderResults(true);};

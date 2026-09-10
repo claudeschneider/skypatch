@@ -2,6 +2,12 @@
 
 Every new commit receives an incremented version. Earlier commits are recorded below without rewriting their history.
 
+## 0.5.0 — 2026-09-10
+
+- Separated Find, Filters, Info, Frame and My sky; search results and selected-object information are immediately accessible.
+- Use embedded planetarium fonts to avoid custom-font startup failures; prevent page pinch zoom while preserving sky gestures.
+- Clarified iOS offline setup: install first, open the Home Screen app online, then download imagery.
+
 ## 0.4.0 — 2026-09-10
 
 - Show or hide the mobile time panel; your choice is remembered.

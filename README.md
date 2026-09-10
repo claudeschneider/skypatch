@@ -7,9 +7,10 @@
 A local-first astrophotography planner built around Stellarium Web Engine. Explore the sky, discover deep-sky targets and preview their true angular size in a DWARF Mini frame.
 
 <!-- release:start -->
-## Latest release · 0.4.0 — 2026-09-10
-- Show or hide the mobile time panel; your choice is remembered.
-- Find Install in the mobile header, with a dismissible first-visit prompt that stays hidden in the installed app.
+## Latest release · 0.5.0 — 2026-09-10
+- Separated Find, Filters, Info, Frame and My sky; search results and selected-object information are immediately accessible.
+- Use embedded planetarium fonts to avoid custom-font startup failures; prevent page pinch zoom while preserving sky gestures.
+- Clarified iOS offline setup: install first, open the Home Screen app online, then download imagery.
 
 [Full changelog](CHANGELOG.md) · [Website changelog](https://claudeschneider.github.io/skypatch/changelog.html)
 <!-- release:end -->

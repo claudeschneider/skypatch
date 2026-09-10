@@ -1,3 +1,13 @@
+## Choose a task
+
+- **Find:** search by name or catalogue number; results appear immediately below. With no search, see objects in the current sky view.
+- **Filters:** narrow the list and map by type, altitude, size and brightness.
+- **Info:** tapping a target opens its details at the top of the drawer.
+- **Frame:** telescope, mosaic and mount settings.
+- **My sky:** draw, enable or clear the visible-sky boundary.
+
+On iPhone/iPad, **install first**, open Sky Patch from its Home Screen icon while online, wait for the core to save, then download the survey. Safari’s downloaded imagery is not copied into the installed app. Test an offline reload from that icon before travelling.
+
 # Using Sky Patch
 
 ## First session

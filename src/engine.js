@@ -15,7 +15,8 @@ export class SkyEngine{
   c.milkyway.addDataSource({url:base+'skydata/surveys/milkyway'});
   c.dss.addDataSource({url:'https://alasky.cds.unistra.fr/DSS/DSSColor'});
   c.constellations.lines_visible=true;c.lines.azimuthal.visible=false;
-  await s.setFont('regular',base+'fonts/Roboto-Regular.ttf');
+  // Use the engine's embedded Noto fonts. Avoid an unnecessary async font
+  // allocation and fallback registration during startup on iOS/WASM.
   this.zoom(90);this.direction(180,35);installTouch(canvas,this);
   // Capture before the vendored engine's cursor-anchored legacy wheel handlers.
   // Change only FOV: the observer's pointing must not move with the cursor.
