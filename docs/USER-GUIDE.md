@@ -4,7 +4,7 @@
 - **Filters:** narrow the list and map by type, altitude, size and brightness.
 - **Info:** tapping a target opens its details at the top of the drawer.
 - **Frame:** telescope, mosaic and mount settings.
-- **My sky:** draw, enable or clear the visible-sky boundary.
+- **My Sky:** draw, enable or clear the visible-sky boundary.
 
 On iPhone/iPad, **install first**, open Sky Patch from its Home Screen icon while online, wait for the core to save, then download the survey. Safari’s downloaded imagery is not copied into the installed app. Test an offline reload from that icon before travelling.
 
@@ -26,7 +26,7 @@ Use Plan to open the bottom drawer. Swipe the drawer header upward to expand; sw
 While drawing a sky patch, hold Space and drag to pan on desktop; scroll to zoom. On mobile, tap to add corners and use two fingers to pan and pinch.
 
 ## Install and prepare for offline use
-Open the app online and select Install / Offline near the bottom of the panel, or use the landing page's installation button. Wait for Core ready offline. This saves the planetarium, bundled bright stars, DSO catalogue and framing tools (about 9.6 MB).
+Open the app online and select App status near the bottom of the panel, or use the landing page's installation button. Wait for Core ready offline. This saves the planetarium, bundled bright stars, DSO catalogue and framing tools (about 9.6 MB).
 
 - iPhone/iPad: Safari → Share → Add to Home Screen.
 - Android: use the in-app Install button if offered, or your browser's Install app menu.
@@ -38,7 +38,7 @@ Installation is optional and browser support varies. Offline caching works on de
 ## Optional imagery
 Download survey overview adds the whole-sky DSS survey through HiPS order 3, roughly one arcminute per pixel. The verified pack was 42.8 MB; a hard 80 MB cap applies. Keep the window open during download. Cancel preserves downloaded tiles and Download resumes. Remove imagery removes only that pack. Fine-detail survey imagery, target-photo previews, Wikipedia and external sources still require internet.
 
-Before leaving, verify readiness, turn off your connection and reload the app. Browser storage may be evicted; a saved app icon alone is not proof that offline data is present. Open **Install / Offline** to see the installed build and select **Check for updates**. When a release is ready, choose **Update now** in the notification or offline panel; **Later** dismisses the notification. Updating reloads the app and preserves saved preferences and downloaded survey imagery. Finish or cancel an imagery download before updating. Updates require an internet connection and a successful website deployment; a repository change alone does not publish a release.
+Before leaving, verify readiness, turn off your connection and reload the app. Browser storage may be evicted; a saved app icon alone is not proof that offline data is present. Open **App status** to see the installed build and select **Check for updates**. When a release is ready, choose **Update now** in the notification or offline panel; **Later** dismisses the notification. Updating reloads the app and preserves saved preferences and downloaded survey imagery. Finish or cancel an imagery download before updating. Updates require an internet connection and a successful website deployment; a repository change alone does not publish a release.
 
 ## Interpretation and privacy
 Survey images illustrate angular scale, not the result your equipment will achieve. Planet discs are geometric footprints; Saturn's rings are not represented. Use a proper solar filter before pointing a telescope at the Sun. Sky Patch does not control the telescope.
@@ -48,3 +48,5 @@ Settings stay in the browser and do not sync between devices. There are no app a
 Equipment presets and constellation modes are available in the Framing panel and map toolbar respectively. Expand Object type to select several categories. Expand All names & identifiers for alternate catalogue names. DSO paragraphs are included in the core offline download.
 
 On mobile, use **Hide time / Show time** above the map to reclaim screen space; the choice is saved. **Install** is also available in the header. A first-visit prompt links to offline setup and can be dismissed with **Not now**. Installed apps do not show the prompt or header Install button.
+
+The top-bar status button shows **Install**, **App** (installed), or **Offline**. Open it for connection and core-cache status, installation guidance, downloads, the installed version, offline changelog and update checks. In **My Sky**, use **Edit points** and drag any corner (or focus it and use arrow keys), then **Save changes**. **Cancel** keeps the original. **Redraw from scratch** starts a replacement without deleting the saved patch until you finish. **All filters** pauses catalogue filters only; the patch has its own switch.

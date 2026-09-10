@@ -2,7 +2,7 @@
 export const panelModes=['explore','filters','info','framing','patch'];
 export function arrangePanels(){
  const $=s=>document.querySelector(s),sidebar=$('#sidebar'),tabs=$('.tabs');
- tabs.innerHTML='<button id="exploreTab" class="active">Find</button><button id="filtersTab">Filters</button><button id="infoTab">Info</button><button id="framingTab">Frame</button><button id="patchTab">My sky</button>';
+ tabs.innerHTML='<button id="exploreTab" class="active">Find</button><button id="filtersTab">Filters</button><button id="infoTab">Info</button><button id="framingTab">Frame</button><button id="patchTab">My Sky</button>';
  const explore=$('#explorePanel'),filters=document.createElement('div');filters.id='filtersPanel';filters.hidden=true;
  while(explore.firstElementChild&&!explore.firstElementChild.classList.contains('result-heading'))filters.append(explore.firstElementChild);
  sidebar.insertBefore(filters,explore);

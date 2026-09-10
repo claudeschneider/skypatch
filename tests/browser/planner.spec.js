@@ -141,7 +141,7 @@ test('Visible sky polygon drawing, horizon anchoring, pause and persistence',asy
  expect(await page.evaluate(()=>skyPatch.state.patch.vertices)).toEqual(vertices);
  expect(await page.evaluate(()=>skyPatch.objects.filter(o=>o.reasons.includes('Outside sky patch')).map(o=>o.id))).not.toEqual(before);
  await page.locator('#patchTab').click();await page.locator('#patchEnabled').uncheck();expect(await page.evaluate(()=>skyPatch.objects.some(o=>o.reasons.includes('Outside sky patch')))).toBe(false);
- await page.locator('#patchTab').click();await page.locator('#patchEnabled').check();await page.locator('#filtersTab').click();await page.locator('#filtersEnabled').uncheck();expect(await page.evaluate(()=>skyPatch.objects.some(o=>o.reasons.includes('Outside sky patch')))).toBe(false);
+ await page.locator('#patchTab').click();await page.locator('#patchEnabled').check();await page.locator('#filtersTab').click();await page.locator('#filtersEnabled').uncheck();expect(await page.evaluate(()=>skyPatch.objects.some(o=>o.reasons.includes('Outside sky patch')))).toBe(true);
  await page.locator('#filtersTab').click();await page.locator('#filtersEnabled').check();await page.locator('#patchTab').click();await page.locator('#drawPatch').click();await page.locator('#cancelPatch').click();expect(await page.evaluate(()=>skyPatch.state.patch.vertices)).toEqual(vertices);
  await page.reload();await page.waitForFunction(()=>!!window.skyPatch);await expect(page.locator('#patchEnabled')).toBeChecked();expect(await page.evaluate(()=>skyPatch.state.patch.vertices)).toEqual(vertices);
  await page.locator('#patchTab').click();await page.locator('#clearPatch').click();await expect(page.locator('#patchEnabled')).toBeDisabled();

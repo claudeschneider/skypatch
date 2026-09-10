@@ -5,17 +5,18 @@ export function installTimeToggle(){
  const render=()=>{document.body.classList.toggle('mobile-time-hidden',hidden);button.textContent=hidden?'Show time':'Hide time';button.setAttribute('aria-expanded',String(!hidden));};
  button.onclick=()=>{hidden=!hidden;try{localStorage.setItem('skypatch-time-hidden',String(hidden));}catch{}render();};render();
 }
-export function installMobilePrompt(open){
+export function installMobilePrompt(open,button,dialog){
  const mobile=matchMedia('(max-width:650px)'),standalone=matchMedia('(display-mode: standalone)'),fullscreen=matchMedia('(display-mode: fullscreen)');
  let installed=!!navigator.standalone||standalone.matches||fullscreen.matches;
- const button=document.createElement('button');button.id='mobileInstall';button.textContent='Install';document.querySelector('.header-actions').prepend(button);
+ button.id='appStatus';
  const prompt=document.createElement('aside');prompt.className='install-nudge';prompt.hidden=true;prompt.setAttribute('aria-label','Install Sky Patch');
  prompt.innerHTML='<p><strong>Take Sky Patch offline</strong><br>Add it to your home screen for observing away from a connection.</p><div><button class="install-start">Install / offline setup</button><button class="install-dismiss">Not now</button></div>';
  document.body.append(prompt);
  const dismiss=()=>{prompt.hidden=true;try{localStorage.setItem('skypatch-install-prompt-seen','true');}catch{}};
  button.onclick=()=>{dismiss();open();};prompt.querySelector('.install-start').onclick=button.onclick;prompt.querySelector('.install-dismiss').onclick=dismiss;
- const sync=()=>{installed=installed||!!navigator.standalone||standalone.matches||fullscreen.matches;button.hidden=installed;if(installed||!mobile.matches)prompt.hidden=true;};
+ const sync=()=>{installed=installed||!!navigator.standalone||standalone.matches||fullscreen.matches;const online=navigator.onLine;button.textContent=!online?'○ Offline':installed?'✓ App':'↓ Install';const description=(installed?'Installed app':'Browser version')+' · '+(online?'Online':'Offline')+' · '+(button.dataset.offlineReady?'Core saved offline':'Check offline readiness');button.title=description+' — version, updates and downloads';button.setAttribute('aria-label',description+' — app status');dialog.querySelector('#appModeStatus').textContent=description;if(installed||!mobile.matches)prompt.hidden=true;};
  for(const query of [mobile,standalone,fullscreen])query.addEventListener('change',sync);
+ for(const event of ['online','offline'])window.addEventListener(event,sync);button.addEventListener('readinesschange',sync);
  window.addEventListener('appinstalled',()=>{installed=true;sync();dismiss();});sync();
  if(!import.meta.env.DEV)setTimeout(()=>{
   let seen=false;try{seen=localStorage.getItem('skypatch-install-prompt-seen')==='true';}catch{}

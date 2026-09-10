@@ -1,3 +1,4 @@
+import {createPatchHandles} from './patch-handles.js';
 import {arrangePanels,panelModes} from './panel-layout.js';
 import {installTimeToggle} from './mobile-controls.js';
 import {installPatchInput} from './patch-input.js';
@@ -28,7 +29,7 @@ const engine=new SkyEngine();let objects=[],filtered=[],visible=[],hitTargets=[]
 delete state.equipment.angle;
 if(saved.equipment&&!saved.equipment.preset&&(state.equipment.width!==2.14||state.equipment.height!==1.2)){state.equipment.preset='custom';state.equipment.pixels=null;}
 let objectDescriptions={};
-let patchContains=null,drawingPatch=false,draftPatch=[];
+let patchContains=null,drawingPatch=false,editingPatch=false,draftPatch=[],patchHandles=[];
 state.patch={vertices:[],enabled:false,...saved.patch};
 try{if(!Array.isArray(state.patch.vertices)||state.patch.vertices.some(v=>!Array.isArray(v)||v.length!==3||v.some(x=>!Number.isFinite(x))))throw Error();if(state.patch.vertices.length)patchContains=preparePatch(state.patch.vertices);}catch{state.patch={vertices:[],enabled:false};}
 
@@ -46,7 +47,7 @@ $('#app').innerHTML=`
 <header><div class="brand"><span class="brandmark">✦</span><strong>Sky Patch</strong><span class="phase">OBSERVING PLANNER</span></div><div class="header-actions"><button id="siteButton" title="Set observing location">⌖ <span id="siteName"></span></button></div></header>
 <div class="workspace"><aside id="sidebar"><button id="drawerHandle" aria-label="Close planning drawer">Planning panel <span>⌄</span></button><div class="search-wrap"><label for="search">Find an object</label><input id="search" type="search" placeholder="M57, Crescent, NGC 7000…" autocomplete="off"><p class="hint">Search includes objects hidden by filters.</p></div>
 <nav class="tabs" aria-label="Planning panels"><button id="exploreTab" class="active">Explore</button><button id="framingTab">Framing</button></nav>
-<section class="patch-controls"><h2>My visible sky</h2><label class="check"><input type="checkbox" id="patchEnabled"> Filter to my sky patch</label><div class="patch-actions"><button id="drawPatch">Draw patch</button><button id="clearPatch">Clear</button></div><p id="patchStatus" class="hint" role="status"></p></section><div id="explorePanel"><details open class="solar-panel"><summary>Solar system</summary><label class="check"><input type="checkbox" id="showSolar" checked> Show true-size discs</label><p class="hint">Independent of deep-sky size and brightness filters. Horizon and altitude filters still apply.</p><div id="solarShortcuts" class="solar-shortcuts"></div></details><label class="check filter-master"><input id="filtersEnabled" type="checkbox" checked> All filters</label><p id="filterToggleStatus" class="hint"></p><details class="filter-details" open><summary>Filter deep-sky objects <button id="resetFilters" class="text-button">Reset</button></summary>
+<section class="patch-controls"><h2>My visible sky</h2><label class="check"><input type="checkbox" id="patchEnabled"> Filter to my sky patch</label><div class="patch-actions"><button id="editPatch">Edit points</button><button id="drawPatch">Draw patch</button><button id="clearPatch">Clear</button></div><p id="patchStatus" class="hint" role="status"></p></section><div id="explorePanel"><details open class="solar-panel"><summary>Solar system</summary><label class="check"><input type="checkbox" id="showSolar" checked> Show true-size discs</label><p class="hint">Independent of deep-sky size and brightness filters. Horizon and altitude filters still apply.</p><div id="solarShortcuts" class="solar-shortcuts"></div></details><label class="check filter-master"><input id="filtersEnabled" type="checkbox" checked> All filters</label><p id="filterToggleStatus" class="hint"></p><details class="filter-details" open><summary>Filter deep-sky objects <button id="resetFilters" class="text-button">Reset</button></summary>
 <div id="type"><details><summary id="typeSummary">All object types</summary><div class="type-actions"><button id="allTypes">All</button><button id="noTypes">None</button></div><div id="typeChoices"></div></details></div>
 <label class="check"><input id="above" type="checkbox" checked> Above the horizon</label>
 <div class="range-pair"><label>Min altitude °<input id="altMin" type="number" min="-90" max="90" value="0"></label><label>Max altitude °<input id="altMax" type="number" min="-90" max="90" value="90"></label></div>
@@ -90,20 +91,27 @@ function syncFilterSwitches(){
   input.disabled=!enabled;fieldset.disabled=!enabled||!input.checked;
  }
  $('#unknown').disabled=!enabled;
- $('#filterToggleStatus').textContent=enabled?'Switch filters off without losing their values.':'Filters paused · your settings are saved. Ground still hides the sky below the horizon.';
+ $('#filterToggleStatus').textContent=enabled?'Switch filters off without losing their values.':'Filters paused · your settings are saved. Your sky patch remains active if enabled. Ground still hides the sky below the horizon.';
 }
 $('#filtersEnabled').onchange=event=>{state.filters.enabled=event.target.checked;syncFilterSwitches();recompute();};
 arrangePanels();
 function syncPatchControls(){
  $('#patchEnabled').checked=state.patch.enabled;$('#patchEnabled').disabled=!patchContains||drawingPatch;
- $('#drawPatch').textContent=patchContains?'Redraw patch':'Draw patch';$('#drawPatch').disabled=drawingPatch;$('#clearPatch').disabled=!patchContains||drawingPatch;
- $('#patchStatus').textContent=drawingPatch?'Your existing patch is kept until you finish.':!patchContains?'Mark your view with a polygon. Saved in this browser.':state.patch.enabled&&state.filters.enabled===false?'Patch filter paused by All filters.':state.patch.enabled?'Filtering by object centre. Boundary stays fixed to your local horizon.':'Patch off · saved boundary retained.';
+ $('#editPatch').disabled=!patchContains||drawingPatch;$('#drawPatch').textContent=patchContains?'Redraw from scratch':'Draw patch';$('#drawPatch').disabled=drawingPatch;$('#clearPatch').disabled=!patchContains||drawingPatch;
+ $('#patchStatus').textContent=drawingPatch?'Your existing patch is kept until you finish.':!patchContains?'Mark your view with a polygon. Saved in this browser.':state.patch.enabled?'Filtering by object centre. Boundary stays fixed to your local horizon.':'Patch off · saved boundary retained.';
 }
-function endPatchDrawing(){resetPatchInput();drawingPatch=false;draftPatch=[];$('#patchDrawing').hidden=true;$('#overlay').style.pointerEvents='none';syncPatchControls();}
-$('#drawPatch').onclick=()=>{if(!ready)return;drawingPatch=true;draftPatch=[];$('#sky').focus({preventScroll:true});if(matchMedia('(max-width:650px)').matches&&!$('.workspace').classList.contains('panel-hidden'))$('#sidebarToggle').click();$('#patchDrawHint').textContent='Tap corners, then Finish. Desktop: hold Space and drag to pan; scroll to zoom. Mobile: use two fingers to pan and pinch.';$('#patchDrawing').hidden=false;$('#overlay').style.pointerEvents='auto';$('#finishPatch').disabled=true;$('#undoPatch').disabled=true;syncPatchControls();};
+function endPatchDrawing(){resetPatchInput();for(const h of patchHandles)h.remove();patchHandles=[];editingPatch=false;drawingPatch=false;draftPatch=[];$('#patchDrawing').hidden=true;$('#overlay').style.pointerEvents='none';syncPatchControls();}
+$('#drawPatch').onclick=()=>{if(!ready)return;drawingPatch=true;editingPatch=false;draftPatch=[];$('#undoPatch').hidden=false;$('#finishPatch').textContent='Finish';$('#sky').focus({preventScroll:true});if(matchMedia('(max-width:650px)').matches&&!$('.workspace').classList.contains('panel-hidden'))$('#sidebarToggle').click();$('#patchDrawHint').textContent='Tap corners, then Finish. Desktop: hold Space and drag to pan; scroll to zoom. Mobile: use two fingers to pan and pinch.';$('#patchDrawing').hidden=false;$('#overlay').style.pointerEvents='auto';$('#finishPatch').disabled=true;$('#undoPatch').disabled=true;syncPatchControls();};
+$('#editPatch').onclick=()=>{
+ if(!ready||!patchContains)return;
+ $('#drawPatch').onclick();editingPatch=true;draftPatch=state.patch.vertices.map(v=>[...v]);
+ $('#undoPatch').hidden=true;$('#finishPatch').disabled=false;$('#finishPatch').textContent='Save changes';
+ $('#patchDrawHint').textContent='Drag any corner to adjust it. Space-drag or two fingers moves the sky. Save changes when ready; Cancel keeps your original patch.';
+ patchHandles=createPatchHandles(draftPatch.length,(i,event)=>{draftPatch[i]=patchRay(event);});
+};
 $('#cancelPatch').onclick=endPatchDrawing;
 $('#undoPatch').onclick=()=>{draftPatch.pop();$('#finishPatch').disabled=draftPatch.length<3;$('#undoPatch').disabled=!draftPatch.length;syncPatchControls();};
-$('#finishPatch').onclick=()=>{try{const contains=preparePatch(draftPatch);state.patch={vertices:draftPatch.map(v=>[...v]),enabled:true};patchContains=contains;endPatchDrawing();recompute();}catch(error){$('#patchStatus').textContent=error.message;$('#patchDrawHint').textContent=error.message;}};
+$('#finishPatch').onclick=()=>{try{const contains=preparePatch(draftPatch);state.patch={vertices:draftPatch.map(v=>[...v]),enabled:editingPatch?state.patch.enabled:true};patchContains=contains;endPatchDrawing();recompute();}catch(error){$('#patchStatus').textContent=error.message;$('#patchDrawHint').textContent=error.message;}};
 $('#clearPatch').onclick=()=>{state.patch={vertices:[],enabled:false};patchContains=null;recompute();};
 $('#patchEnabled').onchange=event=>{state.patch.enabled=event.target.checked;recompute();};
 document.addEventListener('keydown',event=>{if(drawingPatch&&event.key==='Escape'){event.preventDefault();endPatchDrawing();}});
@@ -120,11 +128,14 @@ $('#drawerHandle').addEventListener('touchmove',e=>e.preventDefault(),{passive:f
 $('#drawerHandle').addEventListener('touchend',e=>{if(drawerStart==null)return;const dy=e.changedTouches[0].clientY-drawerStart;drawerStart=null;if(Math.abs(dy)>25){e.preventDefault();if(dy<0)$('#sidebar').classList.add('expanded');else if($('#sidebar').classList.contains('expanded'))$('#sidebar').classList.remove('expanded');else $('#sidebarToggle').click();}},{passive:false});
 const attachObjectInfo=installObjectInfo($('#selection'));
 const canvas=$('#sky'),overlay=$('#overlay'),ctx=overlay.getContext('2d');
-const resetPatchInput=installPatchInput(overlay,canvas,engine,()=>drawingPatch,event=>{
- if(!drawingPatch)return;const r=overlay.getBoundingClientRect(),scale=Math.min(r.width,r.height)/(2*Math.tan(engine.fov*RAD/4));
+function patchRay(event){
+ const r=overlay.getBoundingClientRect(),scale=Math.min(r.width,r.height)/(2*Math.tan(engine.fov*RAD/4));
  const u=(event.clientX-r.left-r.width/2)/scale,v=(r.height/2-event.clientY+r.top)/scale,d=1+u*u+v*v;
- const ray=[2*u/d,2*v/d,(u*u+v*v-1)/d];const st=engine.stel;
- draftPatch.push(st.convertFrame(st.core.observer,'VIEW','OBSERVED_GEOM',ray).slice(0,3));
+ const ray=[2*u/d,2*v/d,(u*u+v*v-1)/d],st=engine.stel;
+ return st.convertFrame(st.core.observer,'VIEW','OBSERVED_GEOM',ray).slice(0,3);
+}
+const resetPatchInput=installPatchInput(overlay,canvas,engine,()=>drawingPatch,event=>{
+ if(!drawingPatch||editingPatch)return;draftPatch.push(patchRay(event));
  $('#finishPatch').disabled=draftPatch.length<3;$('#undoPatch').disabled=false;syncPatchControls();
 });
 function syncInputs(){syncPatchControls();syncFilterSwitches();$('#ground').classList.toggle('active',state.ground);$('#ground').setAttribute('aria-pressed',state.ground);$('#showSolar').checked=state.showSolar;for(const [k,v]of Object.entries(state.filters)){const el=$('#'+k);if(el)el.type==='checkbox'?el.checked=v:el.value=v??'';}syncTypes();syncEquipment();syncConstellations();for(const [k,v]of Object.entries(state.equipment))if($('#'+k))$('#'+k).value=v;syncMountMode();$('#outlineToggle').classList.toggle('active',state.showOutlines);$('#outlineToggle').setAttribute('aria-pressed',state.showOutlines);$('#siteName').textContent=state.site;}
@@ -135,7 +146,7 @@ function recompute(){
  for(const record of engine.solarSystem()){const existing=objects.find(o=>o.solar&&o.id===record.id);if(existing)Object.assign(existing,record,{v:vector(record.ra,record.dec),extent:extent(record)});}
  const m=engine.matrix('OBSERVED_GEOM');
  for(const o of objects){const v=engine.rotate(o.v,m);o.alt=spherical(v)[1];o.reasons=o.solar?[...(!state.showSolar?['Solar system hidden']:[]),...(state.filters.enabled!==false&&state.filters.altEnabled!==false&&state.filters.above&&o.alt<0?['Below horizon']:[]),...(state.filters.enabled!==false&&state.filters.altEnabled!==false&&(o.alt<state.filters.altMin||o.alt>state.filters.altMax)?['Altitude']:[])]:exclusions(o,state.filters,o.alt,state.equipment.width);}
- if(state.patch.enabled&&patchContains&&state.filters.enabled!==false)for(const o of objects){if(!patchContains(engine.rotate(o.v,m)))o.reasons.push('Outside sky patch');}
+ if(state.patch.enabled&&patchContains)for(const o of objects){if(!patchContains(engine.rotate(o.v,m)))o.reasons.push('Outside sky patch');}
  filtered=objects.filter(o=>!o.reasons.length);
  limit=60;syncPatchControls();updateContext();renderSelection();renderResults(true);persist();
 }
@@ -251,7 +262,8 @@ function draw(timestamp){
  if(drawingPatch||(state.patch.enabled&&patchContains)){
   const vertices=drawingPatch?draftPatch:state.patch.vertices,st=engine.stel;
   const icrf=v=>st.convertFrame(st.core.observer,'OBSERVED_GEOM','ICRF',v);
-  drawPath(patchEdges(vertices,!drawingPatch).map(icrf),m,w,h,'#73dcef',[6,4],2,true);
+  drawPath(patchEdges(vertices,!drawingPatch||editingPatch).map(icrf),m,w,h,'#73dcef',[6,4],2,true);
+  for(let i=0;i<patchHandles.length;i++){const p=engine.project(icrf(vertices[i]),w,h,null),handle=patchHandles[i];handle.hidden=!p||p[0]<0||p[0]>w||p[1]<0||p[1]>h;if(!handle.hidden){handle.style.left=p[0]+'px';handle.style.top=p[1]+'px';}}
   ctx.fillStyle='#73dcef';
   for(const v of vertices){const p=engine.project(icrf(v),w,h,null);if(p&&p[0]>=0&&p[0]<=w&&p[1]>=0&&p[1]<=h){ctx.beginPath();ctx.arc(...p,4,0,Math.PI*2);ctx.fill();}}
  }

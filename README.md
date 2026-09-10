@@ -1,16 +1,16 @@
 # Sky Patch
 
-[Website & feature tour](https://claudeschneider.github.io/skypatch/) · [Open planner](https://claudeschneider.github.io/skypatch/app/) · [Install / offline setup](https://claudeschneider.github.io/skypatch/app/?install=1)
+[Website & feature tour](https://claudeschneider.github.io/skypatch/) · [Open planner](https://claudeschneider.github.io/skypatch/app/) · [App status setup](https://claudeschneider.github.io/skypatch/app/?install=1)
 
 ![Sky Patch showing telescope framing](landing/screenshots/framing.jpg)
 
 A local-first astrophotography planner built around Stellarium Web Engine. Explore the sky, discover deep-sky targets and preview their true angular size in a DWARF Mini frame.
 
 <!-- release:start -->
-## Latest release · 0.5.0 — 2026-09-10
-- Separated Find, Filters, Info, Frame and My sky; search results and selected-object information are immediately accessible.
-- Use embedded planetarium fonts to avoid custom-font startup failures; prevent page pinch zoom while preserving sky gestures.
-- Clarified iOS offline setup: install first, open the Home Screen app online, then download imagery.
+## Latest release · 0.6.0 — 2026-09-10
+- Edit My Sky corners by dragging them, with Save, Cancel and Redraw from scratch.
+- Keep the sky patch filter active independently of All filters.
+- Consolidated installation, connection status, offline readiness, version history and updates in one top-bar app status button.
 
 [Full changelog](CHANGELOG.md) · [Website changelog](https://claudeschneider.github.io/skypatch/changelog.html)
 <!-- release:end -->
@@ -99,9 +99,9 @@ Pan to your balcony view, choose **Draw patch**, then click or tap corners and *
 ### Mobile and offline installation
 On phones, **Plan** opens a bottom drawer. Swipe its header up to expand, down to collapse/dismiss, or tap it to close. **View** contains the map layers. Drag with one finger to pan; pinch to zoom about the centre. Selecting an object opens its details in the drawer. These interactions have been tested with Chrome touch emulation; physical iOS/Android checks remain advisable.
 
-The production build is an installable PWA. Open **Install / Offline** near the bottom of the planning panel. The first online visit automatically saves the core (about 9.6 MB), including the engine, bundled bright stars and deep-sky catalogue. Wait for **Core ready offline** before disconnecting. Install using the provided button where available, or Safari's Share → Add to Home Screen. Installation and downloading are separate: the browser website can also work offline after the core is saved. HTTPS is required except on localhost.
+The production build is an installable PWA. Open **App status** near the bottom of the planning panel. The first online visit automatically saves the core (about 9.6 MB), including the engine, bundled bright stars and deep-sky catalogue. Wait for **Core ready offline** before disconnecting. Install using the provided button where available, or Safari's Share → Add to Home Screen. Installation and downloading are separate: the browser website can also work offline after the core is saved. HTTPS is required except on localhost.
 
-The optional **Download survey overview** saves DSS imagery across the whole sky through HiPS order 3 (roughly one arcminute per pixel). A verified download used 42.8 MB; the hard limit is 80 MB. Progress is shown; Cancel keeps completed tiles so Download can resume. Remove imagery preserves the core and your settings. Online survey browsing does not automatically grow this persistent cache. Fine survey detail, object-preview cutouts and Wikipedia are not included in the offline pack. Browsers may evict storage: check offline readiness before a session. Open **Install / Offline** to see the installed build and select **Check for updates**. When a release is ready, choose **Update now** in the notification or offline panel; **Later** dismisses the notification. Updating reloads the app and preserves saved preferences and downloaded survey imagery. Finish or cancel an imagery download before updating. Updates require an internet connection and a successful website deployment; a repository change alone does not publish a release.
+The optional **Download survey overview** saves DSS imagery across the whole sky through HiPS order 3 (roughly one arcminute per pixel). A verified download used 42.8 MB; the hard limit is 80 MB. Progress is shown; Cancel keeps completed tiles so Download can resume. Remove imagery preserves the core and your settings. Online survey browsing does not automatically grow this persistent cache. Fine survey detail, object-preview cutouts and Wikipedia are not included in the offline pack. Browsers may evict storage: check offline readiness before a session. Open **App status** to see the installed build and select **Check for updates**. When a release is ready, choose **Update now** in the notification or offline panel; **Later** dismisses the notification. Updating reloads the app and preserves saved preferences and downloaded survey imagery. Finish or cancel an imagery download before updating. Updates require an internet connection and a successful website deployment; a repository change alone does not publish a release.
 
 For local PWA testing: `npm run build`, then `npm run preview -- --port 4173`, and visit http://127.0.0.1:4173/. The development server deliberately does not register a service worker, to avoid cached releases hiding code changes. Browser settings belong to each origin, so the preview has separate settings from port 5173. Run `npm run test:pwa` against a fresh production build for offline checks.
 
@@ -119,3 +119,5 @@ Object types are a checkbox multi-select with All/None controls. Multiple chosen
 Select an equipment preset in Framing: DWARF II/3/Mini/Draco, Seestar S30/S30 Pro/S50/S50 Pro, Vespera Classic/Passengers/II/Pro/Pro II, or a full-frame DSLR at nine focal lengths from 24–400 mm. See [preset sources and assumptions](docs/EQUIPMENT-PRESETS.md).
 
 Object details show common names and all available catalogue identifiers. Offline descriptions comprise 207 attributed Wikipedia introductions plus a catalogue-derived overview for every other DSO. These are clearly labelled; the overview is not a claim of independently researched history. Regenerate the Wikipedia snapshot explicitly with `python3 scripts/build-descriptions.py` (network required); normal builds simply bundle the checked-in data.
+
+The top-bar status button shows **Install**, **App** (installed), or **Offline**. Open it for connection and core-cache status, installation guidance, downloads, the installed version, offline changelog and update checks. In **My Sky**, use **Edit points** and drag any corner (or focus it and use arrow keys), then **Save changes**. **Cancel** keeps the original. **Redraw from scratch** starts a replacement without deleting the saved patch until you finish. **All filters** pauses catalogue filters only; the patch has its own switch.

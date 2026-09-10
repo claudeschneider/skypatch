@@ -2,6 +2,12 @@
 
 Every new commit receives an incremented version. Earlier commits are recorded below without rewriting their history.
 
+## 0.6.0 — 2026-09-10
+
+- Edit My Sky corners by dragging them, with Save, Cancel and Redraw from scratch.
+- Keep the sky patch filter active independently of All filters.
+- Consolidated installation, connection status, offline readiness, version history and updates in one top-bar app status button.
+
 ## 0.5.0 — 2026-09-10
 
 - Separated Find, Filters, Info, Frame and My sky; search results and selected-object information are immediately accessible.

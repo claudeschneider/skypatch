@@ -2,6 +2,7 @@ from pathlib import Path
 import hashlib,json
 root=Path(__file__).resolve().parents[1]
 dist=root/'dist'
+(dist/'changelog.txt').write_text((root/'CHANGELOG.md').read_text())
 files=sorted(str(f.relative_to(dist)) for f in dist.rglob('*') if f.is_file() and f.name!='sw.js' and 'source' not in f.relative_to(dist).parts)
 digest=hashlib.sha256()
 for name in files:digest.update((dist/name).read_bytes())
