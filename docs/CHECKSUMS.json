@@ -1,0 +1,6 @@
+{
+  "public/vendor/stellarium-web-engine.js": "05210e38b971da7391b84fb94db7833750fc3af284f291d85e638dd0cc47558e",
+  "public/vendor/stellarium-web-engine.wasm": "1a8c2c49429249f75f6667c86da97c1452f5bb20cee926129c6f116eb26a3d76",
+  "public/source/stellarium-engine-source.tar.gz": "959bd7b50ddb4bdead875b9e7a4308ffe7bd7f4ea12f7a6e7e17b1c5f9328c22",
+  "public/data/catalogue.json": "631df683943e66f5e820a642ad83fdcac737b40bc8c78c43bc420201d8c052ba"
+}
